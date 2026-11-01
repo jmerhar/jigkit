@@ -43,6 +43,10 @@ postgres = [
 influx = [
     "httpx2>=2.13",
 ]
+# The push-monitor heartbeat.
+heartbeat = [
+    "httpx2>=2.13",
+]
 # The pytest plugin: fixtures and migration checks for applications built on jigkit.
 testing = [
     "pytest>=9.1",
@@ -50,7 +54,7 @@ testing = [
 ]
 # Everything this repository's own checks need.
 dev = [
-    "jigkit[db,influx,testing]",
+    "jigkit[db,heartbeat,influx,testing]",
     "pytest-cov>=7.1",
     "ruff>=0.16",
     "build>=1.3",
