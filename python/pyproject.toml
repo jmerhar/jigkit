@@ -39,6 +39,10 @@ postgres = [
     "jigkit[db]",
     "asyncpg>=0.30",
 ]
+# InfluxDB sinks: line protocol to InfluxDB 3 and 2.x, and SQL reads from InfluxDB 3.
+influx = [
+    "httpx2>=2.13",
+]
 # The pytest plugin: fixtures and migration checks for applications built on jigkit.
 testing = [
     "pytest>=9.1",
@@ -46,7 +50,7 @@ testing = [
 ]
 # Everything this repository's own checks need.
 dev = [
-    "jigkit[db,testing]",
+    "jigkit[db,influx,testing]",
     "pytest-cov>=7.1",
     "ruff>=0.16",
     "build>=1.3",
