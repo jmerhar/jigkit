@@ -17,7 +17,11 @@ pip install "jigkit[db]"
 | `jigkit.logging` | — | stream and rotating file handlers, a level that changes at runtime, credential-carrying HTTP client loggers kept quiet |
 | `jigkit.healthcheck` | — | `python -m jigkit.healthcheck URL --expect database=connected`, a container health probe |
 | `jigkit.secrets` | — | `load_or_create_secret`, a generated secret kept owner-only in the data directory |
-| `jigkit.testing` | `testing` | a pytest plugin (`data_dir`, `no_network`) and migration checks run through the application's own `env.py` |
+| `jigkit.sinks` | — | `Point` (timestamp with an explicit precision), `Outcome`, the `Sink` protocol, the neutral spooled form |
+| `jigkit.spool`, `jigkit.delivery` | — | a bounded on-disk queue per destination, and write-now-or-spool-and-replay |
+| `jigkit.influx` | `influx` | InfluxDB 3 and 2.x sinks: line protocol in each batch's precision, and SQL reads from InfluxDB 3 |
+| `jigkit.heartbeat` | `heartbeat` | a push-monitor heartbeat after delivered writes, at most once per interval |
+| `jigkit.testing` | `testing` | a pytest plugin (`data_dir`, `no_network`), migration checks run through the application's own `env.py`, and a recording stand-in HTTP server |
 
 PostgreSQL is supported through the `postgres` extra. Python 3.14 or newer.
 

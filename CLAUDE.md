@@ -22,7 +22,12 @@ python/src/jigkit/
   logging.py       configure_logging(), apply_level()
   healthcheck.py   python -m jigkit.healthcheck URL --expect KEY=VALUE
   secrets.py       load_or_create_secret()
-  testing/         pytest plugin (data_dir, no_network) and migration checks
+  sinks.py         Point (timestamp + explicit precision), Outcome, Sink, dump/load_points
+  spool.py         bounded on-disk queue of batches; one per destination
+  delivery.py      write now, or spool and replay oldest first; DeliveryEvents
+  influx/          InfluxDB 3 and 2.x sinks, line protocol, SQL reads (extra influx)
+  heartbeat.py     push-monitor heartbeat after delivered writes (extra heartbeat)
+  testing/         pytest plugin (data_dir, no_network), migration checks, stand-in HTTP server
 python/tests/
   sample_app/      a small application with its own Alembic project, for the migration tests
 bin/               every script the Makefile and CI run
@@ -40,6 +45,11 @@ tooling/           tests of the scripts in bin/ (not part of the package)
   point them at a real database. Coverage follows them through `patch = ["subprocess"]`.
 - **The plugin is loaded from `tests/conftest.py`, not with `-p`,** so coverage is already
   running when it is imported.
+- **A point's timestamp always comes from its source, with its precision.** A write is sent in
+  the batch's own precision, or the finest one in a mixed batch; nothing is left for the server
+  to stamp on arrival, which would record when a backlog was replayed.
+- **`load_points` also reads the four-element form, in seconds**, which spools written before
+  points carried a precision still hold.
 - Each module imports only what its extra provides; `import jigkit` imports nothing else.
 
 ## Commands

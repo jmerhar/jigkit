@@ -14,7 +14,7 @@ once and tested once.
 
 | Directory | Package | Contents |
 |---|---|---|
-| [`python/`](python/) | `jigkit` (PyPI) | settings, database, migrations, logging, health probe, secrets, pytest plugin |
+| [`python/`](python/) | `jigkit` (PyPI) | settings, database, migrations, logging, health probe, secrets, sinks with a durable spool, InfluxDB, a push-monitor heartbeat, pytest plugin |
 
 A matching npm package with the frontend helpers (theme, i18n, API client) is planned and will be
 released under the same version.
