@@ -23,6 +23,8 @@ classifiers = [
 dependencies = [
     "pydantic>=2.13",
     "pydantic-settings>=2.15",
+    # Time zone data for validating TZ, which a slim container image need not carry.
+    "tzdata>=2026.5",
 ]
 
 [project.optional-dependencies]

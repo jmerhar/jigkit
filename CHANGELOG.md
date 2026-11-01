@@ -8,7 +8,8 @@ All notable changes to jigkit are recorded here. The Python and npm packages sha
 
 - `jigkit.settings`: `AppSettings`, with blank environment values treated as unset, `X` or
   `X_FILE` for secrets (setting both is an error), a validated `TZ`, and a default SQLite URL in
-  the data directory.
+  the data directory. `tzdata` is a dependency, so `TZ` validates in images without system
+  zone data.
 - `jigkit.logging`: stream and rotating file handlers, runtime level changes, and HTTP client
   loggers held at WARNING so request URLs and headers are not logged.
 - `jigkit.healthcheck`: a container health probe, `python -m jigkit.healthcheck URL --expect
