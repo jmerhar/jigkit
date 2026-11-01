@@ -57,12 +57,17 @@ jobs:
           python-version: "3.14"
 
       - name: Install
-        run: pip install ruff
+        run: pip install ruff pytest
 
       - name: Lint
         env:
           PYTHON: python
         run: bin/lint.sh
+
+      - name: Test the tooling
+        env:
+          PYTHON: python
+        run: bin/test-tooling.sh
 
   coverage:
     needs: [test]

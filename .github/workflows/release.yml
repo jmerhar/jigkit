@@ -1,0 +1,73 @@
+name: Release
+
+# A version tag (v1.2.3), pushed by bin/release.sh, publishes that version: the Python package to
+# PyPI and the GitHub release from the changelog.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+
+      - name: Install
+        run: pip install -e "python[dev,postgres]"
+
+      - name: Check the tag names the manifests' version
+        run: python3 bin/version.py check "${{ github.ref_name }}"
+
+      # The tagged commit passed CI on main, but a release is not published from code that was not
+      # tested as it stands.
+      - name: Test
+        env:
+          PYTHON: python
+        run: bin/test.sh -q
+
+      - name: Build
+        env:
+          PYTHON: python
+        run: bin/build.sh
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: python-dist
+          path: python/dist/
+          if-no-files-found: error
+
+  pypi:
+    needs: [build]
+    runs-on: ubuntu-latest
+    # Trusted publishing: PyPI accepts this workflow's OIDC token for the jigkit project, so no
+    # API token exists anywhere. The environment can require approval before publishing.
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: python-dist
+          path: dist
+
+      - uses: pypa/gh-action-pypi-publish@release/v1
+
+  github-release:
+    needs: [pypi]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Create the GitHub release from the changelog
+        run: bin/github-release.sh "${{ github.ref_name }}"
+        env:
+          GH_TOKEN: ${{ github.token }}

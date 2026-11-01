@@ -26,6 +26,7 @@ python/src/jigkit/
 python/tests/
   sample_app/      a small application with its own Alembic project, for the migration tests
 bin/               every script the Makefile and CI run
+tooling/           tests of the scripts in bin/ (not part of the package)
 ```
 
 ## Things worth knowing
@@ -47,4 +48,14 @@ bin/               every script the Makefile and CI run
 make install
 make check
 make test ARGS="tests/test_migrations.py -k rebuild"
+make build                 # sdist and wheel into python/dist, checked with twine
+make release V=X.Y.Z       # commit and tag; `git push origin main vX.Y.Z` publishes
 ```
+
+## Releasing
+
+`bin/release.sh` writes the version into every manifest, dates the changelog's Unreleased
+section, commits and tags. Pushing the tag runs `.github/workflows/release.yml`: it tests,
+builds, publishes to PyPI by trusted publishing (environment `pypi`, no token), and creates the
+GitHub release from the changelog. Between releases the manifest carries the next development
+version (`0.2.0.dev0`). `bin/version.py` is tested in `tooling/`.

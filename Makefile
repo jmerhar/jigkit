@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help install test coverage lint check clean
+.PHONY: help install test test-tooling coverage lint build release check clean
 
 ##@ Setup
 
@@ -16,10 +16,21 @@ test: ## Run the test suite (ARGS pass through to pytest)
 coverage: ## Run the suite with coverage and print the summary CI gates on
 	bin/coverage.sh --format md
 
+test-tooling: ## Run the tests of the scripts in bin/
+	bin/test-tooling.sh
+
 lint: ## ruff (lint and format) and ShellCheck
 	bin/lint.sh
 
-check: lint coverage ## Everything (gate a commit on this)
+check: lint test-tooling coverage ## Everything (gate a commit on this)
+
+##@ Releasing
+
+build: ## Build the Python package into python/dist and check it
+	bin/build.sh
+
+release: ## Cut a release: make release V=X.Y.Z (commits and tags; pushing publishes)
+	bin/release.sh $(V)
 
 ##@ Housekeeping
 
