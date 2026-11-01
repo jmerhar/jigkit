@@ -1,0 +1,106 @@
+name: CI
+
+on:
+  # push is limited to main because pull_request already covers branch work; triggering on both
+  # would run everything twice for every pull request.
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch: {}
+
+# Read-only unless a job asks for more, so a compromised step cannot push to the repository.
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+
+      - name: Install
+        run: pip install -e "python[dev,postgres]"
+
+      - name: Run tests with coverage
+        env:
+          # The runner's own Python, rather than the virtualenv a local run uses.
+          PYTHON: python
+        # Through the same script as `make test`, so CI and a local run cannot drift.
+        run: >-
+          bin/test.sh -v --junitxml=junit/python.xml
+          --cov=jigkit --cov-report=term-missing
+          --cov-report=xml --cov-report=json --cov-report=html
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-python
+          path: |
+            python/coverage.xml
+            python/coverage.json
+            python/htmlcov
+            python/junit
+          if-no-files-found: error
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+
+      - name: Install
+        run: pip install ruff
+
+      - name: Lint
+        env:
+          PYTHON: python
+        run: bin/lint.sh
+
+  coverage:
+    needs: [test]
+    runs-on: ubuntu-latest
+    # contents: read for checkout; statuses: write to link the coverage report from the commit.
+    permissions:
+      contents: read
+      statuses: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+
+      # Restored to the path coverage.toml declares.
+      - name: Download coverage
+        uses: actions/download-artifact@v8
+        with:
+          name: coverage-python
+          path: python
+
+      - uses: jmerhar/coverage/.github/actions/summary@v1
+
+      # Informational (see codecov.yml), and before the gate so the data lands even when the gate
+      # fails.
+      - uses: jmerhar/coverage/.github/actions/codecov@v1
+        if: ${{ !cancelled() }}
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          junit: python/junit/*.xml
+
+      # Fails the build if the suite drops below its bound in coverage.toml.
+      - uses: jmerhar/coverage/.github/actions/gate@v1
+
+      # Only on green pushes to main; the action skips when the token is absent.
+      - uses: jmerhar/coverage/.github/actions/publish@v1
+        if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        with:
+          token: ${{ secrets.COVERAGE_PAGES_TOKEN }}
+          description: Python package HTML coverage report

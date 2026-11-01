@@ -1,0 +1,85 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "jigkit"
+version = "0.1.0.dev0"
+description = "The shared foundations of small self-hosted web apps: settings, database, migrations, logging, health checks and test fixtures"
+readme = "README.md"
+requires-python = ">=3.14"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Jure Merhar" }]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Framework :: AsyncIO",
+    "Framework :: Pytest",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.14",
+    "Typing :: Typed",
+]
+dependencies = [
+    "pydantic>=2.13",
+    "pydantic-settings>=2.15",
+]
+
+[project.optional-dependencies]
+# An async SQLAlchemy database, SQLite by default, with Alembic migrations.
+db = [
+    "sqlalchemy[asyncio]>=2.0.52",
+    "aiosqlite>=0.22",
+    "alembic>=1.19",
+]
+# PostgreSQL through asyncpg, on top of `db`.
+postgres = [
+    "jigkit[db]",
+    "asyncpg>=0.30",
+]
+# The pytest plugin: fixtures and migration checks for applications built on jigkit.
+testing = [
+    "pytest>=9.1",
+    "pytest-asyncio>=1.4",
+]
+# Everything this repository's own checks need.
+dev = [
+    "jigkit[db,testing]",
+    "pytest-cov>=7.1",
+    "ruff>=0.16",
+]
+
+[project.urls]
+Homepage = "https://github.com/jmerhar/jigkit"
+Changelog = "https://github.com/jmerhar/jigkit/blob/main/CHANGELOG.md"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/jigkit"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src/jigkit", "tests", "README.md", "LICENSE"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+asyncio_default_test_loop_scope = "function"
+testpaths = ["tests"]
+filterwarnings = ["error"]
+
+[tool.coverage.run]
+source = ["jigkit"]
+# Async throughout. Coverage's sys.monitoring core (COVERAGE_CORE=sysmon, set in bin/test.sh and
+# CI) traces lines after `await`, which the legacy C core under-reports.
+branch = true
+# The migration tests run Alembic in a subprocess; this lets their coverage be measured too.
+patch = ["subprocess"]
+omit = ["*/tests/*"]
+
+[tool.coverage.report]
+show_missing = true
+exclude_also = [
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    "@(abc\\.)?abstractmethod",
+    "if __name__ == .__main__.:",
+]

@@ -1,0 +1,26 @@
+# Weekly updates, one grouped pull request per ecosystem. A release is taken once it is three days
+# old, so a hijacked version has usually been pulled before an update proposes it.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 3
+    groups:
+      actions:
+        patterns:
+          - "*"
+
+  # The package's declared ranges; only a release outside one opens a pull request.
+  - package-ecosystem: "pip"
+    directory: "/python"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 3
+    groups:
+      python:
+        patterns:
+          - "*"

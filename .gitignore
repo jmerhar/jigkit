@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+build/
+dist/
+
+# Test and coverage output
+.coverage
+.coverage.*
+coverage.json
+coverage.xml
+htmlcov/
+junit/
+.pytest_cache/
+.ruff_cache/
+# Staging directory the coverage publish step assembles (CI only)
+coverage-upload/
+# Shared coverage tooling, fetched on demand by `make coverage`
+.coverage-report.py
+
+# Editor and OS
+.idea/
+*.iml
+*.swp
+.DS_Store
+
+# Claude Code local settings
+.claude/settings.local.json
