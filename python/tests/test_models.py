@@ -46,8 +46,8 @@ async def engine(tmp_path: Path) -> AsyncEngine:
 
 class TestUtcDateTime:
     async def test_an_aware_value_comes_back_aware_and_in_utc(self, engine: AsyncEngine) -> None:
-        lisbon_summer = timezone(timedelta(hours=1))
-        stored = datetime(2026, 7, 1, 12, 0, tzinfo=lisbon_summer)
+        an_hour_ahead = timezone(timedelta(hours=1))
+        stored = datetime(2026, 7, 1, 12, 0, tzinfo=an_hour_ahead)
         factory = create_sessionmaker(engine)
         async with session_scope(factory) as session:
             session.add(Shelf(id=1, label="a", checked_at=stored))

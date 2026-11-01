@@ -129,12 +129,12 @@ class TestSecretFiles:
 
 class TestTimeZone:
     def test_read_from_tz(self, monkeypatch: pytest.MonkeyPatch) -> None:
-        monkeypatch.setenv("TZ", "Europe/Lisbon")
+        monkeypatch.setenv("TZ", "Asia/Tokyo")
 
         settings = AppSettings()
 
-        assert settings.timezone == "Europe/Lisbon"
-        assert settings.zone == ZoneInfo("Europe/Lisbon")
+        assert settings.timezone == "Asia/Tokyo"
+        assert settings.zone == ZoneInfo("Asia/Tokyo")
 
     def test_defaults_to_utc(self) -> None:
         assert AppSettings().timezone == "UTC"
