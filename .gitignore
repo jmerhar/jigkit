@@ -28,3 +28,7 @@ coverage-upload/
 
 # Claude Code local settings
 .claude/settings.local.json
+
+# npm package
+node_modules/
+js/coverage/

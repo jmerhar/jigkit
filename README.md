@@ -14,10 +14,10 @@ once and tested once.
 
 | Directory | Package | Contents |
 |---|---|---|
-| [`python/`](python/) | `jigkit` (PyPI) | settings, database, migrations, logging, health probe, secrets, sinks with a durable spool, InfluxDB, a push-monitor heartbeat, FastAPI building blocks, a tick scheduler, Apprise notifications, rate limiting, logins and database sessions, pytest plugin |
+| [`python/`](python/) | `jigkit` (PyPI) | settings, database, migrations, logging, health probe, secrets, sinks with a durable spool, InfluxDB, a push-monitor heartbeat, FastAPI building blocks, a tick scheduler, Apprise notifications, rate limiting, logins, database sessions and passkeys, pytest plugin |
+| [`js/`](js/) | `@jmerhar/jigkit` (npm) | browser storage, theme, language over Paraglide, an API client core, formatters, passkeys in the browser |
 
-A matching npm package with the frontend helpers (theme, i18n, API client) is planned and will be
-released under the same version.
+Both are released together under one version.
 
 ## Using it
 

@@ -1,7 +1,7 @@
 # jigkit
 
 The runtime foundations shared by small self-hosted web apps. One repository, two packages
-released under one version: Python `jigkit` in `python/` (published to PyPI) and, later, npm
+released under one version: Python `jigkit` in `python/` (published to PyPI) and npm
 `@jmerhar/jigkit` in `js/`.
 
 ## This repository is public, and its packages are published permanently
@@ -39,6 +39,9 @@ python/src/jigkit/
                    RecordingSender, SoftAuthenticator (passkeys.py)
 python/tests/
   sample_app/      a small application with its own Alembic project, for the migration tests
+js/src/            the npm package: storage.ts, theme.ts, i18n/ (index, build, testing), api.ts,
+                   format.ts, passkeys.ts; one subpath export each
+js/tests/          Vitest, in jsdom
 bin/               every script the Makefile and CI run
 tooling/           tests of the scripts in bin/ (not part of the package)
 ```
