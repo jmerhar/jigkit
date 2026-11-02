@@ -57,6 +57,11 @@ web = [
 notify = [
     "apprise>=1.9",
 ]
+# Logging people in: password hashes, the login throttle, cookies, first-run setup. Database
+# sessions (jigkit.auth.sessions) also need `db`.
+auth = [
+    "argon2-cffi>=25.1",
+]
 # The pytest plugin: fixtures and migration checks for applications built on jigkit.
 testing = [
     "pytest>=9.1",
@@ -64,7 +69,7 @@ testing = [
 ]
 # Everything this repository's own checks need.
 dev = [
-    "jigkit[db,heartbeat,influx,notify,testing,web]",
+    "jigkit[auth,db,heartbeat,influx,notify,testing,web]",
     "httpx>=0.28",
     "pytest-cov>=7.1",
     "ruff>=0.16",
