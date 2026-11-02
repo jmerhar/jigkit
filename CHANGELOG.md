@@ -2,6 +2,14 @@
 
 All notable changes to jigkit are recorded here. The Python and npm packages share one version.
 
+## Unreleased
+
+### Fixed
+
+- The release workflow creates the directory it packs the npm package into, so the npm package
+  is published with each release. 0.8.0 reached PyPI only; `@jmerhar/jigkit` starts at 0.8.1,
+  identical to the Python package's 0.8.0 apart from the version.
+
 ## 0.8.0 — 2026-11-02
 
 ### Added
