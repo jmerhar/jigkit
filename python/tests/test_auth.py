@@ -1,4 +1,4 @@
-"""Passwords, the login throttle, first-run setup, the session cookie and database sessions."""
+"""Passwords, the login throttle, the session cookie and database sessions."""
 
 from __future__ import annotations
 
@@ -14,7 +14,6 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 from sqlalchemy.orm import Mapped, mapped_column
 
 from jigkit.auth import (
-    SETUP_TOKEN_DISABLED,
     LoginThrottle,
     PasswordTooShort,
     burn_password_check,
@@ -22,8 +21,6 @@ from jigkit.auth import (
     cookie_secure,
     hash_password,
     issue_session_cookie,
-    resolve_setup_token,
-    setup_token_matches,
     verify_password,
 )
 from jigkit.auth.sessions import SessionMixin, SessionStore, token_digest
@@ -109,33 +106,6 @@ class TestLoginThrottle:
         assert list(throttle._failures) == ["a", "c"]
         assert throttle.blocked("a")
         assert not throttle.blocked("b")
-
-
-class TestSetupToken:
-    def test_a_configured_token_is_used(self) -> None:
-        assert resolve_setup_token("let-me-in") == "let-me-in"
-
-    def test_one_is_generated_when_none_is_configured(self) -> None:
-        first, second = resolve_setup_token(None), resolve_setup_token("")
-
-        assert first and second and first != second
-
-    def test_it_can_be_switched_off(self) -> None:
-        assert resolve_setup_token(SETUP_TOKEN_DISABLED) is None
-
-    @pytest.mark.parametrize(
-        ("expected", "given", "matches"),
-        [
-            ("token", "token", True),
-            ("token", "tokeN", False),
-            ("token", None, False),
-            ("token", "tökén", False),
-            (None, None, True),
-            (None, "anything", True),
-        ],
-    )
-    def test_matching(self, expected: str | None, given: str | None, matches: bool) -> None:
-        assert setup_token_matches(expected, given) is matches
 
 
 def cookie_app() -> FastAPI:

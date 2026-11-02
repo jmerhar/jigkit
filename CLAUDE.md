@@ -32,7 +32,7 @@ python/src/jigkit/
   scheduler.py     TickLoop
   notify.py        AppriseSender, redact_url (extra notify)
   ratelimit.py     RateLimiter
-  auth/            passwords.py, throttle.py, setup.py, cookies.py (extra auth); sessions.py
+  auth/            passwords.py, throttle.py, cookies.py (extra auth); sessions.py
                    (SessionMixin, SessionStore; extras auth and db)
   testing/         pytest plugin (data_dir, no_network), migration checks, stand-in HTTP server,
                    RecordingSender

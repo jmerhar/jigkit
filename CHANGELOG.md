@@ -4,6 +4,12 @@ All notable changes to jigkit are recorded here. The Python and npm packages sha
 
 ## Unreleased
 
+### Removed
+
+- `jigkit.auth`'s first-run setup token helpers (`resolve_setup_token`, `setup_token_matches`,
+  `SETUP_TOKEN_DISABLED`). Applications built on jigkit do not guard first-run setup with a
+  token; a lock against two simultaneous setups is the application's own.
+
 ## 0.5.1 — 2026-11-02
 
 ### Fixed
