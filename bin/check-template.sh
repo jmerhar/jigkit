@@ -21,7 +21,7 @@ slug="household-inventory-tracker"
 work=""
 container=""
 # The container, and the temporary directory when no DIR was given, go however the script ends.
-# shellcheck disable=SC2329  # called by the EXIT trap below
+# shellcheck disable=SC2317,SC2329  # called by the EXIT trap below
 finish() {
   if [ -n "$container" ]; then docker rm -f "$container" >/dev/null 2>&1 || true; fi
   if [ -n "$work" ]; then rm -rf "$work"; fi
