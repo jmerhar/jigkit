@@ -30,8 +30,9 @@ FOLLOW_ROOT = ("uvicorn", "uvicorn.access", "uvicorn.error")
 
 #: Loggers held at WARNING however low the application goes. httpx logs every request's URL at
 #: INFO and httpcore logs headers at DEBUG, and URLs and headers carry credentials: push-monitor
-#: tokens, bot tokens, session cookies.
-QUIET = ("httpx", "httpcore")
+#: tokens, bot tokens, session cookies. httpx2 and httpcore2, which jigkit's own HTTP clients
+#: use, log the same under their own names.
+QUIET = ("httpx", "httpcore", "httpx2", "httpcore2")
 
 # Marks the handlers this module installed, so a repeated call replaces them rather than stacking
 # a second copy that logs every line twice.

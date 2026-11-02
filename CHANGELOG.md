@@ -4,6 +4,12 @@ All notable changes to jigkit are recorded here. The Python and npm packages sha
 
 ## Unreleased
 
+### Fixed
+
+- `jigkit.logging` holds `httpx2` and `httpcore2` at WARNING too, beside `httpx` and
+  `httpcore`. jigkit's InfluxDB sinks and heartbeat use httpx2, which logs every request's URL
+  at INFO under its own name, so at INFO a push monitor's token reached the log.
+
 ## 0.3.0 — 2026-11-02
 
 ### Added

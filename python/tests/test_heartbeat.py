@@ -168,3 +168,23 @@ async def test_each_call_reports_whether_it_got_through() -> None:
         await heartbeat.call()
 
     assert results == [False, True]
+
+
+async def test_at_info_the_push_token_never_reaches_the_log(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """The HTTP client logs each request's URL at INFO; jigkit's logging keeps it below that."""
+    from jigkit.logging import QUIET, apply_level
+
+    levels = {name: logging.getLogger(name).level for name in QUIET}
+    apply_level("INFO")
+    try:
+        with caplog.at_level(logging.INFO):
+            async with serving(StubServer(status=200)) as stub, httpx2.AsyncClient() as client:
+                await Heartbeat(client, stub.url + "/api/push/T0KEN", interval_seconds=60).call()
+    finally:
+        for name, level in levels.items():
+            logging.getLogger(name).setLevel(level)
+
+    assert stub.requests[0].path == "/api/push/T0KEN"
+    assert "T0KEN" not in caplog.text
