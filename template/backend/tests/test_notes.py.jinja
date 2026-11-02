@@ -1,0 +1,51 @@
+"""Notes, each user's own."""
+
+import httpx
+from conftest import PASSWORD
+from jigkit.auth import hash_password
+
+from {{ package }}.models import User
+
+
+async def test_a_note_is_kept_changed_and_deleted(client: httpx.AsyncClient, user) -> None:
+    made = await client.post("/api/notes", json={"title": " Groceries ", "body": "milk"})
+    assert made.status_code == 201
+    note = made.json()
+    assert (note["title"], note["body"]) == ("Groceries", "milk")
+
+    changed = await client.put(
+        f"/api/notes/{note['id']}", json={"title": "Shopping", "body": "eggs"}
+    )
+    assert changed.json()["title"] == "Shopping"
+    assert [n["title"] for n in (await client.get("/api/notes")).json()] == ["Shopping"]
+
+    assert (await client.delete(f"/api/notes/{note['id']}")).status_code == 204
+    assert (await client.get("/api/notes")).json() == []
+    assert (await client.delete(f"/api/notes/{note['id']}")).status_code == 404
+
+
+async def test_the_most_recently_changed_come_first(client, user) -> None:
+    first = (await client.post("/api/notes", json={"title": "first"})).json()
+    await client.post("/api/notes", json={"title": "second"})
+    await client.put(f"/api/notes/{first['id']}", json={"title": "first again"})
+
+    assert [n["title"] for n in (await client.get("/api/notes")).json()] == [
+        "first again",
+        "second",
+    ]
+
+
+async def test_notes_need_a_login_and_belong_to_their_owner(client, user, app, new_client) -> None:
+    note = (await client.post("/api/notes", json={"title": "mine"})).json()
+    async with new_client() as stranger:
+        assert (await stranger.get("/api/notes")).status_code == 401
+
+    async with app.state.services.sessionmaker() as db:
+        db.add(User(name="Bea", login="bea", password_hash=hash_password(PASSWORD)))
+        await db.commit()
+    async with new_client() as bea:
+        await bea.post("/api/auth/login", json={"login": "bea", "password": PASSWORD})
+        assert (await bea.get("/api/notes")).json() == []
+        assert (
+            await bea.put(f"/api/notes/{note['id']}", json={"title": "theirs"})
+        ).status_code == 404

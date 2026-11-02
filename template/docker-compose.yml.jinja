@@ -1,0 +1,48 @@
+# The stack, as one service.
+#
+# Self-contained: this file is all anyone needs to run {{ app_title }}, so it pulls the published
+# image rather than naming a build context. Building from source is docker-compose.build.yml,
+# which `make up` adds.
+#
+# Everything mutable lives in ./data: the database. Back that directory up and there is nothing
+# else to keep.
+services:
+  {{ app_slug }}:
+    # The release line: every release that keeps these settings and the stored data working.
+    image: ghcr.io/{{ github_owner }}/{{ app_slug }}:0.1
+    container_name: {{ app_slug }}
+    restart: unless-stopped
+    # Runs as an ordinary user so the files under ./data belong to a real account on the host.
+    # Change it to match the owner of that directory.
+    user: "${APP_UID:-1000}:${APP_GID:-1000}"
+    mem_limit: 512m
+    # Nothing in the image is written at run time: the application writes only to /data and
+    # /tmp, and Python writes no bytecode. It needs no Linux capabilities.
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    environment:
+      TZ: ${TZ:-UTC}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      # The address people open the app at behind your reverse proxy, such as
+      # https://{{ app_slug }}.example.com. Writes from any other origin are refused, and passkeys
+      # belong to this address's host name.
+      PUBLIC_URL: ${PUBLIC_URL:-}
+      # The proxies whose X-Forwarded-For and X-Forwarded-Proto are believed: loopback, and Docker's
+      # bridge networks, which a proxy on this host reaches a published port through. The client
+      # address the login throttle counts is the last one an untrusted hop added, so "*" would let
+      # a client choose its own.
+      FORWARDED_ALLOW_IPS: ${FORWARDED_ALLOW_IPS:-127.0.0.1,172.16.0.0/12}
+      COOKIE_SECURE: ${COOKIE_SECURE:-}
+      LOGIN_ATTEMPTS_PER_MINUTE: ${LOGIN_ATTEMPTS_PER_MINUTE:-10}
+      # Where notifications go, as an Apprise URL, such as
+      #   NOTIFY_URL=mailto://user:password@smtp.example.com:587/?to=me@example.com
+      # or NOTIFY_URL_FILE naming a file that holds one (a Docker secret). Unset, none are sent.
+      NOTIFY_URL: ${NOTIFY_URL:-}
+    ports:
+      # Loopback, for a reverse proxy to publish. Until the first account is made, the first
+      # person to open the interface makes it, so finish setup before anyone else can reach it.
+      - "${APP_BIND:-127.0.0.1}:${APP_PORT:-8000}:8000"
+    volumes:
+      - ./data:/data

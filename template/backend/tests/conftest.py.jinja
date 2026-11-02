@@ -1,0 +1,94 @@
+"""Shared fixtures.
+
+Every test runs against its own temporary data directory and SQLite file (jigkit's ``data_dir``),
+so no test sees another's rows and none touches a real database. The API is driven the way the
+interface drives it: setup and login through their endpoints, writes with the write header.
+"""
+
+from __future__ import annotations
+
+from collections.abc import AsyncIterator, Callable
+from pathlib import Path
+from typing import TYPE_CHECKING
+
+import httpx
+import pytest
+from fastapi import FastAPI
+from jigkit.web import WRITE_HEADER
+
+from {{ package }}.api.app import create_app
+from {{ package }}.auth import WRITE_HEADER_VALUE
+from {{ package }}.config import Settings
+from {{ package }}.models import Base
+
+if TYPE_CHECKING:
+    from jigkit.testing.notify import RecordingSender
+
+# jigkit's fixtures (data_dir, no_network). Named here rather than imported, so pytest registers
+# the plugin before anything in it is imported.
+pytest_plugins = ["jigkit.testing"]
+
+#: The password every test account is made with.
+PASSWORD = "correct horse battery"
+#: Where the tests' notifications go; RecordingSender keeps them instead.
+NOTIFY_URL = "ntfy://ntfy.test/{{ app_slug }}"
+
+
+@pytest.fixture
+def settings(data_dir: Path) -> Settings:
+    """Settings pointed at the throwaway directory, serving no built interface."""
+    return Settings(data_dir=data_dir, static_dir=None, notify_url=NOTIFY_URL)
+
+
+@pytest.fixture
+def sender() -> RecordingSender:
+    """Keeps the notifications the application sends."""
+    from jigkit.testing.notify import RecordingSender
+
+    return RecordingSender()
+
+
+@pytest.fixture
+async def app(settings: Settings, sender: RecordingSender) -> AsyncIterator[FastAPI]:
+    """The application with its lifespan running and its schema created from the models.
+
+    ``create_all`` rather than the migrations: test_migrations.py checks separately that the
+    migrations produce exactly this schema.
+    """
+    application = create_app(settings, sender)
+    async with application.router.lifespan_context(application):
+        async with application.state.services.engine.begin() as connection:
+            await connection.run_sync(Base.metadata.create_all)
+        yield application
+
+
+@pytest.fixture
+def new_client(app: FastAPI) -> Callable[..., httpx.AsyncClient]:
+    """Open a browser talking to the application, with its own cookies."""
+
+    def open_client(*, write_header: bool = True) -> httpx.AsyncClient:
+        headers = {WRITE_HEADER: WRITE_HEADER_VALUE} if write_header else {}
+        return httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app),
+            base_url="http://{{ app_slug }}.test",
+            headers=headers,
+        )
+
+    return open_client
+
+
+@pytest.fixture
+async def client(new_client: Callable[..., httpx.AsyncClient]) -> AsyncIterator[httpx.AsyncClient]:
+    """A browser, sending the write header as the interface does."""
+    async with new_client() as browser:
+        yield browser
+
+
+@pytest.fixture
+async def user(client: httpx.AsyncClient) -> dict:
+    """The first account, made through setup; ``client`` is logged in as it."""
+    response = await client.post(
+        "/api/setup", json={"name": "Ana", "login": "ana", "password": PASSWORD}
+    )
+    assert response.status_code == 201, response.text
+    return response.json()

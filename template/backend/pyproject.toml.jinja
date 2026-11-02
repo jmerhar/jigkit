@@ -1,0 +1,63 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "{{ app_slug }}"
+version = "0.1.0.dev0"
+description = "{{ description }}"
+requires-python = ">=3.14"
+license = "MIT"
+dependencies = [
+    # Settings, database, migrations, logging, logins, passkeys, notifications and the web
+    # building blocks. Pinned exactly; Dependabot proposes each new release.
+    "jigkit[auth,db,notify,passkeys,web]=={{ jigkit_version }}",
+    "fastapi>=0.141,<1",
+    "uvicorn[standard]>=0.52",
+    "sqlalchemy[asyncio]>=2.0.52",
+    "aiosqlite>=0.22",
+    "alembic>=1.19",
+    "pydantic>=2.13",
+    "pydantic-settings>=2.15",
+    # Time zones for TZ, which the slim base image may not carry.
+    "tzdata>=2026.5",
+]
+
+[project.optional-dependencies]
+test = [
+    "jigkit[testing]=={{ jigkit_version }}",
+    "pytest>=9.1",
+    "pytest-asyncio>=1.4",
+    "pytest-cov>=7.1",
+    "httpx>=0.28",
+    "ruff>=0.16",
+]
+
+[project.urls]
+Homepage = "https://github.com/{{ github_owner }}/{{ app_slug }}"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/{{ package }}"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+asyncio_default_test_loop_scope = "function"
+testpaths = ["tests"]
+filterwarnings = ["error"]
+
+[tool.coverage.run]
+source = ["{{ package }}"]
+# Async throughout. Coverage's sys.monitoring core (COVERAGE_CORE=sysmon, set in
+# bin/test-backend.sh and CI) traces lines after `await`, which the legacy C core under-reports.
+branch = true
+# The migration tests run Alembic in a subprocess; this measures the environment it loads.
+patch = ["subprocess"]
+omit = ["*/tests/*", "*/__main__.py"]
+
+[tool.coverage.report]
+show_missing = true
+exclude_also = [
+    "if TYPE_CHECKING:",
+    "if __name__ == .__main__.:",
+]

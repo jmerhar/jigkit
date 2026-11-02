@@ -19,6 +19,20 @@ once and tested once.
 
 Both are released together under one version.
 
+## Starting an application
+
+```bash
+pipx run copier copy --trust gh:jmerhar/jigkit myapp
+cd myapp && git init && make lockfile && make install && make openapi && make check
+```
+
+The template (`template/`, configured by `copier.yml`) makes a FastAPI backend and a Svelte
+interface on both packages and on [devtools](https://github.com/jmerhar/devtools): password and
+passkey logins, first-run setup, revocable sessions, English and European Portuguese, Apprise
+notifications, notes as a first table to replace, migrations, tests at full coverage, a
+Dockerfile, compose files and a CI workflow that publishes the image. It pins the release it is
+rendered from; `copier update` brings later template changes into an existing application.
+
 ## Using it
 
 ```bash

@@ -1,0 +1,55 @@
+# Shared build tooling from jmerhar/devtools, fetched into .devtools/ by bin/devtools-fetch.sh.
+[fetch]
+ref = "v1"
+files = [
+  "make/devtools.mk",
+  "config/ruff.toml",
+  "bin/lint.sh",
+  "bin/ci-ruff.sh",
+  "bin/check-compose.sh",
+  "bin/check-lockfile.sh",
+  "bin/lockfile.sh",
+  "bin/version.py",
+  "bin/release.sh",
+  "bin/github-release.sh",
+  "bin/openapi.sh",
+  "bin/export-openapi.py",
+  "bin/dev.sh",
+]
+coverage = true
+
+# Every check `make lint` runs.
+[lint]
+checks = ["shellcheck", "ruff", "lockfile", "version", "compose"]
+ruff = "backend/.venv/bin/ruff"
+
+# Each combination of compose files that is run, validated by `make lint` and CI.
+[compose]
+stacks = [
+  ["docker-compose.yml"],
+  ["docker-compose.yml", "docker-compose.build.yml"],
+]
+
+# The stack `make dev` starts with hot reload.
+[dev]
+compose_files = ["docker-compose.yml", "docker-compose.dev.yml"]
+
+# The interface, whose lockfile resolves only to the public registry.
+[npm]
+dirs = ["frontend"]
+
+# Where the release version is written; the compose file follows the image's release line.
+[version]
+pyprojects = ["backend/pyproject.toml"]
+npm = ["frontend"]
+images = ["ghcr.io/{{ github_owner }}/{{ app_slug }}"]
+
+[release]
+title = "{{ app_title }}"
+
+# The committed schema and the interface's types generated from it (`make openapi`).
+[openapi]
+app = "{{ package }}.api.schema:build_app"
+schema = "frontend/openapi.json"
+types = "frontend/src/lib/api-types.ts"
+defaults_optional = false

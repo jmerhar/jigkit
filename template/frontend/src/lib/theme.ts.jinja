@@ -1,0 +1,28 @@
+/**
+ * Light, dark, or the device's own setting, kept on this browser: a phone and a laptop can want
+ * different ones. jigkit shows it, and colours the browser's bar from app.css's --bg.
+ */
+
+import { applyTheme as apply, chooseTheme as choose, chosenTheme as chosen } from "@jmerhar/jigkit/theme";
+
+export type Theme = "auto" | "light" | "dark";
+
+/** Read by index.html's first script too, so a dark choice never flashes light. */
+const KEY = "{{ app_slug }}:theme";
+
+const shown = (theme: Theme) => (theme === "auto" ? null : theme);
+
+/** The theme chosen on this browser, or "auto" to follow the device. */
+export function chosenTheme(): Theme {
+  return chosen(KEY) ?? "auto";
+}
+
+/** Show the page in `theme`. */
+export function applyTheme(theme: Theme): void {
+  apply(shown(theme));
+}
+
+/** Choose `theme` on this browser, and show it. */
+export function chooseTheme(theme: Theme): void {
+  choose(KEY, shown(theme));
+}

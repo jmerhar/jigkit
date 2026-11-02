@@ -1,0 +1,49 @@
+# Weekly updates, one grouped pull request per ecosystem. A pull request builds the image, so a
+# dependency that breaks it fails there.
+# A release is taken once it is three days old, so a hijacked version has usually been pulled
+# before an update proposes it.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      actions:
+        patterns:
+          - "*"
+
+  # The interface.
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"
+    # jigkit, released from the same hands, is taken at once.
+    cooldown:
+      default-days: 3
+      exclude:
+        - "@jmerhar/jigkit"
+    # svelte-check names the TypeScript majors it supports as a peer dependency, so a new major
+    # cannot install until svelte-check accepts it; move both by hand then.
+    ignore:
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+    groups:
+      frontend:
+        patterns:
+          - "*"
+
+  # The backend's declared ranges; only a release outside one opens a pull request.
+  - package-ecosystem: "pip"
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+    # jigkit, released from the same hands, is taken at once.
+    cooldown:
+      default-days: 3
+      exclude:
+        - "jigkit"
+    groups:
+      backend:
+        patterns:
+          - "*"

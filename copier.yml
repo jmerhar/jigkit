@@ -1,0 +1,50 @@
+# A new application built on jigkit and devtools: copier copy gh:jmerhar/jigkit myapp
+#
+# The template is in template/; files ending .jinja are rendered, the rest copied as they are.
+_subdirectory: template
+_templates_suffix: .jinja
+_answers_file: .copier-answers.yml
+_min_copier_version: "9.4"
+
+app_slug:
+  type: str
+  help: The application's name in URLs, images and package names (lowercase letters, digits and dashes)
+  validator: >-
+    {% if not (app_slug | regex_search('^[a-z][a-z0-9]*(-[a-z0-9]+)*$')) %}
+    Use lowercase letters, digits and single dashes, starting with a letter.
+    {% endif %}
+
+app_title:
+  type: str
+  help: The application's name as people read it
+  default: "{{ app_slug | replace('-', ' ') | title }}"
+
+description:
+  type: str
+  help: One line saying what it does
+  default: "{{ app_title }}, a small self-hosted web app"
+
+package:
+  type: str
+  help: The Python package's name
+  default: "{{ app_slug | replace('-', '_') }}"
+  validator: >-
+    {% if not (package | regex_search('^[a-z][a-z0-9_]*$')) %}
+    Use lowercase letters, digits and underscores, starting with a letter.
+    {% endif %}
+
+github_owner:
+  type: str
+  help: The GitHub account or organisation the repository lives under (for the image's name)
+
+author:
+  type: str
+  help: Who holds the copyright, for the licence
+
+# The jigkit release the new application pins, for both packages: the release copier renders
+# from (the latest tag unless --vcs-ref names another), or from a later commit the release before
+# it, since only released packages can be installed.
+jigkit_version:
+  type: str
+  default: "{{ (_commit or 'v0.0.0').lstrip('v').split('-')[0] }}"
+  when: false

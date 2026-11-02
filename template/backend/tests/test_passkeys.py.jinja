@@ -1,0 +1,117 @@
+"""Adding passkeys and logging in with them, against jigkit's software authenticator."""
+
+import pytest
+from jigkit.testing.passkeys import SoftAuthenticator
+
+ORIGIN = "http://{{ app_slug }}.test"
+
+
+@pytest.fixture
+def authenticator() -> SoftAuthenticator:
+    return SoftAuthenticator(origin=ORIGIN)
+
+
+async def add_passkey(client, authenticator: SoftAuthenticator, label: str = "Phone") -> dict:
+    options = (await client.post("/api/auth/passkeys/options")).json()
+    response = await client.post(
+        "/api/auth/passkeys", json={"label": label, "credential": authenticator.register(options)}
+    )
+    assert response.status_code == 201, response.text
+    return response.json()
+
+
+async def passkey_login(browser, authenticator: SoftAuthenticator, **answer):
+    options = (await browser.post("/api/auth/passkey-login/options")).json()
+    return await browser.post(
+        "/api/auth/passkey-login",
+        json={"credential": authenticator.authenticate(options, **answer)},
+    )
+
+
+async def test_a_passkey_is_added_listed_and_removed(client, user, authenticator) -> None:
+    options = (await client.post("/api/auth/passkeys/options")).json()
+    assert options["rp"] == {
+        "id": "{{ app_slug }}.test",
+        "name": "{{ app_title }}",
+    }
+    assert options["authenticatorSelection"]["residentKey"] == "required"
+
+    added = await add_passkey(client, authenticator)
+
+    assert [p["label"] for p in (await client.get("/api/auth/passkeys")).json()] == ["Phone"]
+    again = (await client.post("/api/auth/passkeys/options")).json()
+    assert len(again["excludeCredentials"]) == 1
+    assert (await client.delete(f"/api/auth/passkeys/{added['id']}")).status_code == 204
+    assert (await client.delete(f"/api/auth/passkeys/{added['id']}")).status_code == 404
+
+
+async def test_a_passkey_logs_its_owner_in(client, user, authenticator, new_client) -> None:
+    await add_passkey(client, authenticator)
+    async with new_client() as browser:
+        response = await passkey_login(browser, authenticator)
+
+        assert response.status_code == 200, response.text
+        assert (await browser.get("/api/auth/me")).json()["login"] == "ana"
+    used = (await client.get("/api/auth/passkeys")).json()[0]
+    assert used["last_used_at"] is not None
+
+
+async def test_the_same_passkey_cannot_be_added_twice(client, user, authenticator) -> None:
+    await add_passkey(client, authenticator)
+    options = (await client.post("/api/auth/passkeys/options")).json()
+    again = authenticator.register(options, credential=authenticator.credentials[0])
+    response = await client.post("/api/auth/passkeys", json={"label": "b", "credential": again})
+
+    assert (response.status_code, response.json()["detail"]) == (409, "passkey_exists")
+
+
+async def test_answers_that_do_not_hold_up_are_refused(
+    client, user, authenticator, new_client
+) -> None:
+    options = (await client.post("/api/auth/passkeys/options")).json()
+    forged = authenticator.register(options, origin="https://evil.test")
+    rejected = await client.post("/api/auth/passkeys", json={"label": "x", "credential": forged})
+    assert (rejected.status_code, rejected.json()["detail"]) == (400, "passkey_rejected")
+    expired = await client.post("/api/auth/passkeys", json={"label": "x", "credential": forged})
+    assert (expired.status_code, expired.json()["detail"]) == (400, "passkey_expired")
+
+    await add_passkey(client, authenticator)
+    stranger = SoftAuthenticator(origin=ORIGIN)
+    stranger.register((await client.post("/api/auth/passkeys/options")).json())
+    async with new_client() as browser:
+        unknown = await passkey_login(browser, stranger)
+        added = authenticator.credentials[-1]
+        elsewhere = await passkey_login(
+            browser, authenticator, credential=added, origin="https://evil.test"
+        )
+        await browser.post("/api/auth/passkey-login/options")
+        malformed = await browser.post("/api/auth/passkey-login", json={"credential": {"id": "x"}})
+        no_ceremony = await browser.post(
+            "/api/auth/passkey-login", json={"credential": {"id": "x"}}
+        )
+
+    assert (unknown.status_code, unknown.json()["detail"]) == (401, "passkey_unknown")
+    assert (elsewhere.status_code, elsewhere.json()["detail"]) == (401, "passkey_rejected")
+    assert (malformed.status_code, malformed.json()["detail"]) == (400, "passkey_rejected")
+    assert (no_ceremony.status_code, no_ceremony.json()["detail"]) == (400, "passkey_expired")
+
+
+async def test_a_passkey_presented_for_someone_else_is_refused(
+    client, user, authenticator, new_client
+) -> None:
+    await add_passkey(client, authenticator)
+    authenticator.credentials[0].user_handle = b"another person's handle"
+    async with new_client() as browser:
+        response = await passkey_login(browser, authenticator)
+
+    assert (response.status_code, response.json()["detail"]) == (401, "passkey_unknown")
+
+
+async def test_failures_count_against_the_throttle(user, settings, new_client) -> None:
+    async with new_client() as browser:
+        for _ in range(settings.login_attempts_per_minute):
+            await browser.post("/api/auth/passkey-login/options")
+            await browser.post("/api/auth/passkey-login", json={"credential": {"id": "x"}})
+        response = await browser.post("/api/auth/passkey-login", json={"credential": {"id": "x"}})
+
+    assert (response.status_code, response.json()["detail"]) == (429, "too_many_attempts")

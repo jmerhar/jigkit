@@ -1,0 +1,26 @@
+"""Passwords, sessions and the login throttle, on jigkit.auth.
+
+jigkit hashes passwords (Argon2id, at least ten characters), keeps sessions as hashed tokens with
+a sliding expiry, and throttles failed logins per address. Sessions here belong to users.
+"""
+
+from datetime import timedelta
+
+from jigkit.auth.sessions import SessionStore
+
+from .models import Session
+
+#: How long a login lasts without being used; each use extends it.
+SESSION_LIFETIME = timedelta(days=90)
+#: The cookie a browser's session token travels in.
+SESSION_COOKIE = "{{ app_slug }}_session"
+#: The value of the X-Requested-With header every write must carry (jigkit's write guard). A
+#: browser will not send a custom header across origins without a CORS preflight, which this app
+#: never grants, so a page elsewhere cannot forge it.
+WRITE_HEADER_VALUE = "{{ app_slug }}"
+#: The cookie a passkey ceremony's key travels in, sent only to the routes that finish one.
+CEREMONY_COOKIE = "{{ app_slug }}_webauthn"
+CEREMONY_PATH = "/api/auth"
+
+#: Opens, finds and ends users' sessions.
+SESSIONS = SessionStore(Session, owner="user_id", lifetime=SESSION_LIFETIME)

@@ -52,6 +52,9 @@ js/src/            the npm package: storage.ts, theme.ts, i18n/ (index, build, t
                    format.ts, passkeys.ts, auth/svelte/ (Svelte components); one subpath export
                    each, built by svelte-package
 js/tests/          Vitest, in jsdom
+copier.yml         the template's questions; template/ is what it renders
+template/          a new application (backend, frontend, Dockerfile, CI); *.jinja files are
+                   rendered. bin/check-template.sh renders one and runs its make check and image
 bin/               every script the Makefile and CI run that is jigkit's own
 devtools.toml      the shared scripts fetched from jmerhar/devtools into .devtools/ (gitignored)
 ```
@@ -80,6 +83,14 @@ devtools.toml      the shared scripts fetched from jmerhar/devtools into .devtoo
   answers whatever no route matched.
 - Each module imports only what its extra provides; `import jigkit` imports nothing else.
 
+- **The template is checked as the application it renders,** by `bin/check-template.sh` in CI:
+  rendered with a long name, on this checkout's jigkit, through its own `make check` and up to a
+  running image. jigkit's ruff skips `template/`. A line whose wrapping depends on the
+  application's name breaks `ruff format --check` in some applications, so a name goes into a
+  short statement of its own (a constant, a variable) rather than a long call.
+- **The template pins the release copier renders from** (`_commit`), so it needs no change per
+  release; rendered from a later commit it pins the release before.
+
 ## Commands
 
 ```bash
@@ -87,6 +98,7 @@ make install
 make check
 make test ARGS="tests/test_migrations.py -k rebuild"
 make test-js ARGS="tests/i18n.test.ts"
+make check-template        # needs Docker, and an npm registry that serves @jmerhar/jigkit
 make build                 # sdist and wheel into python/dist, checked with twine
 make release V=X.Y.Z       # commit and tag; `git push origin main vX.Y.Z` publishes
 ```

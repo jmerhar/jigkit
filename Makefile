@@ -1,4 +1,4 @@
-.PHONY: install test test-js coverage lint build lockfile release check clean
+.PHONY: install test test-js check-template coverage lint build lockfile release check clean
 
 # help, devtools-update and coverage-tooling come from jmerhar/devtools; make fetches them on the
 # first run and whenever devtools.toml changes.
@@ -28,6 +28,9 @@ coverage: ## Run both suites with coverage and print the summary CI gates on
 
 lint: ## ruff (lint and format), ShellCheck, the lockfile's registry, one version everywhere
 	bin/lint.sh
+
+check-template: ## Render the template into an application and run its checks and image
+	bin/check-template.sh $(DIR)
 
 check: lint coverage ## Everything (gate a commit on this)
 

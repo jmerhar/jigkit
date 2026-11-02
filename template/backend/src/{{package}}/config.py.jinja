@@ -1,0 +1,31 @@
+"""Runtime configuration, read from the environment.
+
+Built on jigkit's ``AppSettings``, which supplies the data directory, the database URL, the log
+level, ``PUBLIC_URL``, ``COOKIE_SECURE``, ``FORWARDED_ALLOW_IPS``, ``TZ`` and ``REVISION``, and
+the rules every app shares: a blank variable means unset, and a secret can be given as ``X`` or
+``X_FILE`` but not both.
+"""
+
+from functools import lru_cache
+from pathlib import Path
+
+from jigkit.settings import AppSettings
+
+
+class Settings(AppSettings):
+    """Everything the application reads from its environment."""
+
+    database_filename = "{{ app_slug }}.db"
+
+    login_attempts_per_minute: int = 10
+
+    # Where notifications go, as an Apprise URL (mailto://, signal://, ntfy:// and many more). It
+    # can carry a password, so it can instead be read from a file, such as a Docker secret.
+    notify_url: str | None = None
+    notify_url_file: Path | None = None
+
+
+@lru_cache
+def get_settings() -> Settings:
+    """The process-wide settings, read once."""
+    return Settings()

@@ -1,0 +1,42 @@
+# {{ app_title }}
+
+{{ description }}.
+
+A FastAPI backend and a Svelte interface, built on
+[jigkit](https://github.com/jmerhar/jigkit) for its foundations and
+[devtools](https://github.com/jmerhar/devtools) for its build tooling, and shipped as one
+container image.
+
+## Running it
+
+```bash
+curl -O https://raw.githubusercontent.com/{{ github_owner }}/{{ app_slug }}/main/docker-compose.yml
+docker compose up -d
+```
+
+Open http://127.0.0.1:8000 and make the first account. The settings are environment variables,
+each explained in `docker-compose.yml`; the data lives in `./data`.
+
+## Developing
+
+```bash
+make lockfile   # once, after the template is copied: frontend/package-lock.json
+make install    # the backend's virtualenv and the frontend's packages
+make openapi    # once, then after changing the API: the schema and the interface's types
+make check      # lint, the API contract, both suites and their coverage gates
+make dev        # the stack with hot reload: the API on :8000, the interface on :5173
+```
+
+`make help` lists the rest.
+
+| Path | What it holds |
+|---|---|
+| `backend/src/{{ package }}/` | settings, models, the API's routes |
+| `backend/alembic/` | migrations, run by the container before it serves |
+| `backend/tests/` | pytest, against a throwaway database per test |
+| `frontend/src/` | the interface: `App.svelte`, `pages/`, `lib/` |
+| `frontend/messages/` | the interface's words, in English and European Portuguese |
+
+## License
+
+MIT

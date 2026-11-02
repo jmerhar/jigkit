@@ -1,0 +1,42 @@
+"""The application as a whole: the health check, the write guard and the built interface."""
+
+from pathlib import Path
+
+import httpx
+
+from {{ package }}.api.app import create_app
+from {{ package }}.config import Settings
+
+BASE_URL = "http://{{ app_slug }}.test"
+
+
+async def test_the_health_check_queries_the_database(client: httpx.AsyncClient) -> None:
+    response = await client.get("/api/health")
+
+    assert response.status_code == 200
+    assert response.json()["database"] == "connected"
+
+
+async def test_a_write_without_the_header_is_refused(new_client, user) -> None:
+    async with new_client(write_header=False) as browser:
+        response = await browser.post("/api/notes", json={"title": "x"})
+
+    assert (response.status_code, response.json()["detail"]) == (403, "missing_write_header")
+
+
+async def test_the_built_interface_is_served_beside_the_api(data_dir: Path) -> None:
+    web = data_dir / "web"
+    web.mkdir()
+    (web / "index.html").write_text("<html>{{ app_title }}</html>")
+    app = create_app(Settings(data_dir=data_dir, static_dir=web))
+    transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url=BASE_URL) as browser:
+        response = await browser.get("/notes")
+
+    assert response.text == "<html>{{ app_title }}</html>"
+
+
+def test_the_schema_export_builds_the_app(tmp_path: Path) -> None:
+    from {{ package }}.api.schema import build_app
+
+    assert "/api/notes" in build_app(tmp_path).openapi()["paths"]

@@ -1,0 +1,22 @@
+"""The migrations, through the application's own Alembic environment."""
+
+from pathlib import Path
+
+from jigkit.testing.migrations import MigrationProject
+
+from {{ package }}.models import Base
+
+DATABASE = "{{ app_slug }}.db"
+PROJECT = MigrationProject(Path(__file__).parents[1], database_filename=DATABASE)
+
+
+def test_the_migrations_build_the_models_schema(data_dir: Path) -> None:
+    PROJECT.assert_models_match(Base.metadata, data_dir)
+
+
+def test_there_is_one_head() -> None:
+    PROJECT.assert_single_head()
+
+
+def test_rebuilding_a_table_keeps_the_rows_pointing_at_it(data_dir: Path, tmp_path: Path) -> None:
+    PROJECT.assert_parent_rebuilds_keep_children(Base.metadata, data_dir, tmp_path)

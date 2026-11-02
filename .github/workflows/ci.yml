@@ -74,6 +74,32 @@ jobs:
           path: js/coverage
           if-no-files-found: error
 
+  template:
+    # A new application rendered from the template, on this checkout's jigkit, through its own
+    # make check and up to a running image.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # copier describes the template's commit from the tags.
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+
+      - name: Install
+        run: |
+          pip install copier
+          npm ci --no-audit --no-fund --prefix js
+
+      - name: Render and check an application
+        run: bin/check-template.sh
+
   lint:
     runs-on: ubuntu-latest
     steps:

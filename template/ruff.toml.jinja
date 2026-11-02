@@ -1,0 +1,5 @@
+# Shared by the backend, its tests, and the scripts in bin/. The rules come from jmerhar/devtools.
+extend = ".devtools/config/ruff.toml"
+
+[lint.isort]
+known-first-party = ["{{ package }}"]
