@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "jigkit"
-version = "0.6.0.dev0"
+version = "0.5.1.dev0"
 description = "The shared foundations of small self-hosted web apps: settings, database, migrations, logging, health checks and test fixtures"
 readme = "README.md"
 requires-python = ">=3.14"
@@ -47,10 +47,10 @@ influx = [
 heartbeat = [
     "httpx2>=2.13",
 ]
-# FastAPI building blocks and uvicorn. FastAPI is held to a minor line: how it reports a matched
-# route's path has changed within a minor release before.
+# FastAPI building blocks and uvicorn. FastAPI is held below 1.0, which may break its API; an
+# application pins its own minor line.
 web = [
-    "fastapi>=0.141,<0.144",
+    "fastapi>=0.141,<1",
     "uvicorn[standard]>=0.30",
 ]
 # Notifications through Apprise.

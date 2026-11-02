@@ -4,6 +4,12 @@ All notable changes to jigkit are recorded here. The Python and npm packages sha
 
 ## Unreleased
 
+### Fixed
+
+- The `web` extra accepts any FastAPI from 0.141 below 1.0, rather than below 0.144, so an
+  application can move to a newer FastAPI without waiting for jigkit. The suite passes on
+  FastAPI 0.162 with Starlette 1.10.
+
 ## 0.5.0 — 2026-11-02
 
 ### Added
