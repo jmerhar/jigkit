@@ -1,6 +1,6 @@
 name: Release
 
-# A version tag (v1.2.3), pushed by bin/release.sh, publishes that version: the Python package to
+# A version tag (v1.2.3), pushed by `make release`, publishes that version: the Python package to
 # PyPI and the GitHub release from the changelog.
 on:
   push:
@@ -22,8 +22,12 @@ jobs:
       - name: Install
         run: pip install -e "python[dev,postgres]"
 
+      # The shared scripts from jmerhar/devtools, at the ref devtools.toml pins.
+      - name: Fetch the shared tooling
+        run: bin/devtools-fetch.sh
+
       - name: Check the tag names the manifests' version
-        run: python3 bin/version.py check "${{ github.ref_name }}"
+        run: python3 .devtools/bin/version.py check "${{ github.ref_name }}"
 
       # The tagged commit passed CI on main, but a release is not published from code that was not
       # tested as it stands.
@@ -67,7 +71,10 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      - name: Fetch the shared tooling
+        run: bin/devtools-fetch.sh
+
       - name: Create the GitHub release from the changelog
-        run: bin/github-release.sh "${{ github.ref_name }}"
+        run: .devtools/bin/github-release.sh "${{ github.ref_name }}"
         env:
           GH_TOKEN: ${{ github.token }}

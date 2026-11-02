@@ -1,0 +1,24 @@
+# Shared build tooling from jmerhar/devtools, fetched into .devtools/ by bin/devtools-fetch.sh.
+[fetch]
+ref = "v1"
+files = [
+  "make/devtools.mk",
+  "bin/lockfile.sh",
+  "bin/check-lockfile.sh",
+  "bin/version.py",
+  "bin/release.sh",
+  "bin/github-release.sh",
+]
+coverage = true
+
+# The npm package, whose lockfile resolves only to the public registry.
+[npm]
+dirs = ["js"]
+
+# The Python and npm packages share one version.
+[version]
+pyprojects = ["python/pyproject.toml"]
+npm = ["js"]
+
+[release]
+title = "jigkit"

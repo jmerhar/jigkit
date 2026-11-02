@@ -57,17 +57,16 @@ jobs:
           python-version: "3.14"
 
       - name: Install
-        run: pip install ruff pytest
+        run: pip install ruff
+
+      # The shared scripts from jmerhar/devtools, at the ref devtools.toml pins.
+      - name: Fetch the shared tooling
+        run: bin/devtools-fetch.sh
 
       - name: Lint
         env:
           PYTHON: python
         run: bin/lint.sh
-
-      - name: Test the tooling
-        env:
-          PYTHON: python
-        run: bin/test-tooling.sh
 
   coverage:
     needs: [test]

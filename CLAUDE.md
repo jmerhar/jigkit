@@ -51,8 +51,8 @@ python/tests/
 js/src/            the npm package: storage.ts, theme.ts, i18n/ (index, build, testing), api.ts,
                    format.ts, passkeys.ts; one subpath export each
 js/tests/          Vitest, in jsdom
-bin/               every script the Makefile and CI run
-tooling/           tests of the scripts in bin/ (not part of the package)
+bin/               every script the Makefile and CI run that is jigkit's own
+devtools.toml      the shared scripts fetched from jmerhar/devtools into .devtools/ (gitignored)
 ```
 
 ## Things worth knowing
@@ -91,8 +91,10 @@ make release V=X.Y.Z       # commit and tag; `git push origin main vX.Y.Z` publi
 
 ## Releasing
 
-`bin/release.sh` writes the version into every manifest, dates the changelog's Unreleased
-section, commits and tags. Pushing the tag runs `.github/workflows/release.yml`: it tests,
-builds, publishes to PyPI by trusted publishing (environment `pypi`, no token), and creates the
-GitHub release from the changelog. Between releases the manifest carries the next development
-version (`0.2.0.dev0`). `bin/version.py` is tested in `tooling/`.
+`make release` runs jmerhar/devtools' `release.sh`, which writes the version into every manifest
+devtools.toml's `[version]` lists, dates the changelog's Unreleased section, commits and tags.
+Pushing the tag runs `.github/workflows/release.yml`: it tests, builds, publishes to PyPI by
+trusted publishing (environment `pypi`, no token), and creates the GitHub release from the
+changelog. Between releases the manifest carries the next development
+version: `0.2.0.dev0` in the pyproject, and npm's spelling of it, `0.2.0-dev.0`, in
+`js/package.json`.
