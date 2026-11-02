@@ -32,6 +32,8 @@ python/src/jigkit/
   scheduler.py     TickLoop
   notify.py        AppriseSender, redact_url (extra notify)
   ratelimit.py     RateLimiter
+  auth/            passwords.py, throttle.py, setup.py, cookies.py (extra auth); sessions.py
+                   (SessionMixin, SessionStore; extras auth and db)
   testing/         pytest plugin (data_dir, no_network), migration checks, stand-in HTTP server,
                    RecordingSender
 python/tests/
@@ -56,6 +58,9 @@ tooling/           tests of the scripts in bin/ (not part of the package)
   to stamp on arrival, which would record when a backlog was replayed.
 - **`load_points` also reads the four-element form, in seconds**, which spools written before
   points carried a precision still hold.
+- **Session cookies never read X-Forwarded-Proto themselves.** The Secure flag follows the
+  request's scheme, which uvicorn sets from a proxy it believes (`FORWARDED_ALLOW_IPS`); reading
+  the header directly would let any client choose it.
 - **The web pieces are building blocks, not a framework.** An application keeps its own app
   factory and lifespan, and applies what it wants; `mount_spa` goes last because its catch-all
   answers whatever no route matched.

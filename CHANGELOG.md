@@ -4,6 +4,21 @@ All notable changes to jigkit are recorded here. The Python and npm packages sha
 
 ## Unreleased
 
+### Added
+
+- `jigkit.auth` (extra `auth`):
+  - `hash_password` and `verify_password` (Argon2id with a length floor), and
+    `burn_password_check`, so a login naming nobody takes as long as a wrong password;
+  - `LoginThrottle`: failed logins per address in a sliding minute, forgotten on success, with
+    bounded memory;
+  - `resolve_setup_token` and `setup_token_matches`: a generated first-run token, `off` to
+    disable it, and a constant-time comparison;
+  - `issue_session_cookie`, `clear_session_cookie` and `cookie_secure`: an HttpOnly, SameSite=Lax
+    cookie whose Secure flag follows the request's own scheme, never a raw forwarded header.
+- `jigkit.auth.sessions` (extras `auth` and `db`): `SessionMixin` for an application's session
+  table, and `SessionStore`, which keeps hashed tokens with a sliding expiry and opens, finds,
+  ends and prunes them.
+
 ## 0.4.0 — 2026-11-02
 
 ### Added
