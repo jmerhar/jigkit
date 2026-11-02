@@ -27,7 +27,13 @@ python/src/jigkit/
   delivery.py      write now, or spool and replay oldest first; DeliveryEvents
   influx/          InfluxDB 3 and 2.x sinks, line protocol, SQL reads (extra influx)
   heartbeat.py     push-monitor heartbeat after delivered writes (extra heartbeat)
-  testing/         pytest plugin (data_dir, no_network), migration checks, stand-in HTTP server
+  web/             FastAPI building blocks: guard.py, spa.py, health.py, manifest.py,
+                   server.py (serve) (extra web)
+  scheduler.py     TickLoop
+  notify.py        AppriseSender, redact_url (extra notify)
+  ratelimit.py     RateLimiter
+  testing/         pytest plugin (data_dir, no_network), migration checks, stand-in HTTP server,
+                   RecordingSender
 python/tests/
   sample_app/      a small application with its own Alembic project, for the migration tests
 bin/               every script the Makefile and CI run
@@ -50,6 +56,9 @@ tooling/           tests of the scripts in bin/ (not part of the package)
   to stamp on arrival, which would record when a backlog was replayed.
 - **`load_points` also reads the four-element form, in seconds**, which spools written before
   points carried a precision still hold.
+- **The web pieces are building blocks, not a framework.** An application keeps its own app
+  factory and lifespan, and applies what it wants; `mount_spa` goes last because its catch-all
+  answers whatever no route matched.
 - Each module imports only what its extra provides; `import jigkit` imports nothing else.
 
 ## Commands

@@ -4,6 +4,22 @@ All notable changes to jigkit are recorded here. The Python and npm packages sha
 
 ## Unreleased
 
+### Added
+
+- `jigkit.web` (extra `web`), building blocks for a FastAPI application:
+  - `install_write_guard`: a write under the API needs `X-Requested-With` and the
+    application's own Origin;
+  - `install_security_headers`: nosniff, a same-origin referrer, no framing;
+  - `mount_spa`: the built app with immutable assets, an uncached shell and a 404 for unknown
+    API paths;
+  - `health_router`: `/health` that queries the database and answers 503 when it cannot;
+  - `web_manifest`, `manifest_response` and `preferred_language`: the PWA manifest;
+  - `serve`: uvicorn, believing forwarded headers only from `FORWARDED_ALLOW_IPS`.
+- `jigkit.scheduler`: `TickLoop`, in-process work on a fixed tick that survives a failing tick.
+- `jigkit.notify` (extra `notify`): `AppriseSender`, which sends off the event loop, and
+  `redact_url`; `jigkit.testing.notify.RecordingSender` for tests.
+- `jigkit.ratelimit`: `RateLimiter`, a token bucket per client with bounded memory.
+
 ## 0.2.0 — 2026-11-01
 
 ### Added
