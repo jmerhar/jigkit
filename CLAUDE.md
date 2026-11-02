@@ -11,6 +11,15 @@ employer or internal names, hostnames, registries or tooling; no names of privat
 personal locations, providers or paths. Examples use generic names (`myapp`, `owners`, `pets`).
 A release on PyPI or npm can never be replaced, only yanked.
 
+## Writing for readers of this repository
+
+Commit messages, comments, docstrings, READMEs, the changelog and test comments must make sense
+to someone who has only this repository. Describe jigkit in its own terms: what the code does
+and the standing reason why. Never lean on what such a reader cannot see: particular
+deployments or hosts, the applications that use jigkit or the code it was taken from, systems
+something replaced, other sessions or "the brief", "in production", or where a test's expected
+value came from. Name another project only by linking its public repository.
+
 ## Layout
 
 ```
