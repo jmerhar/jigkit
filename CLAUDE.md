@@ -33,9 +33,10 @@ python/src/jigkit/
   notify.py        AppriseSender, redact_url (extra notify)
   ratelimit.py     RateLimiter
   auth/            passwords.py, throttle.py, cookies.py (extra auth); sessions.py
-                   (SessionMixin, SessionStore; extras auth and db)
+                   (SessionMixin, SessionStore; extras auth and db); passkeys.py (extras
+                   passkeys and db)
   testing/         pytest plugin (data_dir, no_network), migration checks, stand-in HTTP server,
-                   RecordingSender
+                   RecordingSender, SoftAuthenticator (passkeys.py)
 python/tests/
   sample_app/      a small application with its own Alembic project, for the migration tests
 bin/               every script the Makefile and CI run

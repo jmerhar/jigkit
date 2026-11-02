@@ -27,7 +27,8 @@ pip install "jigkit[db]"
 | `jigkit.ratelimit` | — | `RateLimiter`: a token bucket per client with bounded memory |
 | `jigkit.auth` | `auth` | Argon2id passwords, a bounded failed-login throttle, the session cookie |
 | `jigkit.auth.sessions` | `auth`, `db` | logins in the database as hashed, revocable tokens with a sliding expiry |
-| `jigkit.testing` | `testing` | a pytest plugin (`data_dir`, `no_network`), migration checks run through the application's own `env.py`, and a recording stand-in HTTP server |
+| `jigkit.auth.passkeys` | `passkeys`, `db` | WebAuthn ceremonies to add a passkey and log in with one, a bounded in-memory challenge store, `PasskeyMixin` |
+| `jigkit.testing` | `testing` | a pytest plugin (`data_dir`, `no_network`), migration checks run through the application's own `env.py`, a recording stand-in HTTP server, and a software passkey authenticator (with `passkeys`) |
 
 PostgreSQL is supported through the `postgres` extra. Python 3.14 or newer.
 

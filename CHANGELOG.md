@@ -10,6 +10,15 @@ All notable changes to jigkit are recorded here. The Python and npm packages sha
   Every route needs a credential (an application's own check, sync or async) unless it is
   declared open by method and full path template; `route_templates(app)` and
   `AccessPolicy.unknown(app)` let a test hold the declarations to the real route table.
+- `jigkit.auth.passkeys` (extras `passkeys` and `db`): the WebAuthn ceremonies that add a
+  passkey (`registration_options`, `verify_registration`) and log in with one
+  (`authentication_options`, `parse_login`, `verify_login`), with every bad answer raised as
+  `PasskeyRejected`; `relying_party` from the public URL or the request; `Ceremonies`, the
+  challenges waiting for their answer, bounded and expiring; `hold_ceremony` and
+  `clear_ceremony` for the cookie carrying a ceremony's key; and `PasskeyMixin` for an
+  application's passkey table.
+- `jigkit.testing.passkeys.SoftAuthenticator`: a software authenticator with real ES256 keys,
+  for testing passkey routes end to end.
 
 ## 0.6.0 — 2026-11-02
 
