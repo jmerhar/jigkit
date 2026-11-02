@@ -85,6 +85,7 @@ devtools.toml      the shared scripts fetched from jmerhar/devtools into .devtoo
 make install
 make check
 make test ARGS="tests/test_migrations.py -k rebuild"
+make test-js ARGS="tests/i18n.test.ts"
 make build                 # sdist and wheel into python/dist, checked with twine
 make release V=X.Y.Z       # commit and tag; `git push origin main vX.Y.Z` publishes
 ```
@@ -94,7 +95,8 @@ make release V=X.Y.Z       # commit and tag; `git push origin main vX.Y.Z` publi
 `make release` runs jmerhar/devtools' `release.sh`, which writes the version into every manifest
 devtools.toml's `[version]` lists, dates the changelog's Unreleased section, commits and tags.
 Pushing the tag runs `.github/workflows/release.yml`: it tests, builds, publishes to PyPI by
-trusted publishing (environment `pypi`, no token), and creates the GitHub release from the
-changelog. Between releases the manifest carries the next development
-version: `0.2.0.dev0` in the pyproject, and npm's spelling of it, `0.2.0-dev.0`, in
+trusted publishing (environment `pypi`, no token) and to npmjs from environment `npm` (trusted
+publishing once npmjs names it, `NPM_TOKEN` until then, with provenance either way), and creates
+the GitHub release from the changelog. Between releases the manifests carry the next
+development version: `0.2.0.dev0` in the pyproject, and npm's spelling of it, `0.2.0-dev.0`, in
 `js/package.json`.

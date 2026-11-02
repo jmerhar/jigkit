@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run the suite with coverage and print the summary.
+# Run both packages' suites with coverage and print the summary.
 #
 # The summary and the gate are shared tooling from jmerhar/coverage, fetched with the rest of the
 # shared tooling and configured by coverage.toml, so the numbers here are the ones CI enforces. Arguments go to the summary (`make coverage` asks
@@ -11,6 +11,7 @@ cd "$(dirname "$0")/.."
 bin/devtools-fetch.sh
 bin/test.sh -q --cov=jigkit --cov-report=term-missing \
   --cov-report=xml --cov-report=json --cov-report=html
+bin/test-js.sh --coverage >/dev/null
 
 echo
 python3 .devtools/coverage/coverage-report.py "$@"

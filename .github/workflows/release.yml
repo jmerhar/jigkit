@@ -1,7 +1,7 @@
 name: Release
 
 # A version tag (v1.2.3), pushed by `make release`, publishes that version: the Python package to
-# PyPI and the GitHub release from the changelog.
+# PyPI, the npm package to npmjs, and the GitHub release from the changelog.
 on:
   push:
     tags: ["v*"]
@@ -47,6 +47,33 @@ jobs:
           path: python/dist/
           if-no-files-found: error
 
+  build-js:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: js
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+
+      - name: Install
+        run: npm ci
+
+      - name: Test
+        run: ../bin/test-js.sh
+
+      - name: Pack
+        run: npm run build && npm pack --pack-destination ../npm-dist
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: npm-dist
+          path: npm-dist/
+          if-no-files-found: error
+
   pypi:
     needs: [build]
     runs-on: ubuntu-latest
@@ -63,8 +90,33 @@ jobs:
 
       - uses: pypa/gh-action-pypi-publish@release/v1
 
+  npm:
+    needs: [build, build-js]
+    runs-on: ubuntu-latest
+    # Trusted publishing once npmjs names this workflow and environment as the package's publisher:
+    # npm exchanges the OIDC token for a short-lived one. Until then NPM_TOKEN stands in. Either
+    # way the package is published with provenance.
+    environment: npm
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: npm-dist
+          path: npm-dist
+
+      - name: Publish
+        run: npm publish npm-dist/*.tgz --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
   github-release:
-    needs: [pypi]
+    needs: [pypi, npm]
     runs-on: ubuntu-latest
     permissions:
       contents: write

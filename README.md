@@ -83,12 +83,13 @@ See [`python/README.md`](python/README.md) for the module list.
 ## Developing
 
 ```bash
-make install   # virtualenv with the package and its checks
-make check     # ruff, ShellCheck, the suite and the coverage gate
+make install   # the virtualenv and js/node_modules
+make check     # ruff, ShellCheck, both suites and the coverage gates
 make test ARGS="tests/test_settings.py -k blank"
+make test-js ARGS="tests/format.test.ts"
 ```
 
-Python 3.14 or newer.
+Python 3.14 or newer; Node 24 for the npm package.
 
 ## License
 

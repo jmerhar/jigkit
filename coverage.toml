@@ -10,3 +10,10 @@ format = "coveragepy"
 report = "python/coverage.json"
 html = "python/htmlcov"
 gate = 99.0
+
+[suites.js]
+label = "npm package"
+format = "istanbul"
+report = "js/coverage/coverage-summary.json"
+html = "js/coverage/html"
+gate = 99.0

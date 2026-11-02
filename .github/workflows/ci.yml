@@ -47,6 +47,33 @@ jobs:
             python/junit
           if-no-files-found: error
 
+  test-js:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+
+      - name: Install
+        working-directory: js
+        run: npm ci
+
+      - name: Type-check and test with coverage
+        run: bin/test-js.sh --coverage
+
+      - name: Check the package builds and packs
+        working-directory: js
+        run: npm run build && npm pack --dry-run
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-js
+          path: js/coverage
+          if-no-files-found: error
+
   lint:
     runs-on: ubuntu-latest
     steps:
@@ -69,7 +96,7 @@ jobs:
         run: bin/lint.sh
 
   coverage:
-    needs: [test]
+    needs: [test, test-js]
     runs-on: ubuntu-latest
     # contents: read for checkout; statuses: write to link the coverage report from the commit.
     permissions:
@@ -89,6 +116,12 @@ jobs:
           name: coverage-python
           path: python
 
+      - name: Download npm package coverage
+        uses: actions/download-artifact@v8
+        with:
+          name: coverage-js
+          path: js/coverage
+
       - uses: jmerhar/coverage/.github/actions/summary@v1
 
       # Informational (see codecov.yml), and before the gate so the data lands even when the gate
@@ -107,4 +140,4 @@ jobs:
         if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main'
         with:
           token: ${{ secrets.COVERAGE_PAGES_TOKEN }}
-          description: Python package HTML coverage report
+          description: HTML coverage reports for both packages
