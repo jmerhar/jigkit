@@ -30,3 +30,4 @@ coverage-upload/
 # npm package
 node_modules/
 js/coverage/
+js/.svelte-kit/

@@ -49,7 +49,8 @@ python/src/jigkit/
 python/tests/
   sample_app/      a small application with its own Alembic project, for the migration tests
 js/src/            the npm package: storage.ts, theme.ts, i18n/ (index, build, testing), api.ts,
-                   format.ts, passkeys.ts; one subpath export each
+                   format.ts, passkeys.ts, auth/svelte/ (Svelte components); one subpath export
+                   each, built by svelte-package
 js/tests/          Vitest, in jsdom
 bin/               every script the Makefile and CI run that is jigkit's own
 devtools.toml      the shared scripts fetched from jmerhar/devtools into .devtools/ (gitignored)

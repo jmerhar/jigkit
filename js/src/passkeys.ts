@@ -17,6 +17,7 @@ import {
   type PublicKeyCredentialCreationOptionsJSON,
   type PublicKeyCredentialRequestOptionsJSON,
 } from "@simplewebauthn/browser";
+import { browserStorage, keepStored, readStored } from "./storage.js";
 
 export interface Authenticator {
   /** Whether this browser can use passkeys at all. */
@@ -69,4 +70,30 @@ const DEVICES: readonly (readonly [RegExp, string])[] = [
 /** A name for this device to label a passkey with, guessed from the browser: "iPhone", "Mac". */
 export function deviceName(userAgent: string = navigator.userAgent, fallback = "Passkey"): string {
   return DEVICES.find(([pattern]) => pattern.test(userAgent))?.[1] ?? fallback;
+}
+
+/**
+ * What this browser remembers about passkeys, under keys starting with an application's `prefix`.
+ * A site cannot ask whether a passkey for it exists, so a login with one is remembered instead,
+ * and the login page then offers a passkey first.
+ */
+export interface PasskeyMemory {
+  /** Whether someone has logged in with a passkey on this browser. */
+  usedHere(): boolean;
+  rememberUsed(): void;
+  /** Whether the offer to set up a passkey after a password login was turned down here. */
+  offerDeclined(): boolean;
+  declineOffer(): void;
+}
+
+/** A {@link PasskeyMemory} in the browser's storage; one that keeps nothing simply asks again. */
+export function passkeyMemory(prefix: string, storage: Storage | undefined = browserStorage()): PasskeyMemory {
+  const used = `${prefix}:passkey-used`;
+  const declined = `${prefix}:passkey-offer-declined`;
+  return {
+    usedHere: () => readStored(used, storage) === "1",
+    rememberUsed: () => void keepStored(used, "1", storage),
+    offerDeclined: () => readStored(declined, storage) === "1",
+    declineOffer: () => void keepStored(declined, "1", storage),
+  };
 }

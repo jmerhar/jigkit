@@ -11,5 +11,5 @@ if [ ! -d node_modules ]; then
   echo "No js/node_modules. Run 'make install' first." >&2
   exit 1
 fi
-npx --no-install tsc --noEmit
+npx --no-install svelte-check --tsconfig ./tsconfig.json --fail-on-warnings
 exec npx --no-install vitest run "$@"

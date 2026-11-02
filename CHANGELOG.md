@@ -4,6 +4,22 @@ All notable changes to jigkit are recorded here. The Python and npm packages sha
 
 ## Unreleased
 
+### Added
+
+- `@jmerhar/jigkit/auth/svelte`: Svelte 5 components for logging in, which take the
+  application's words and API calls as props and carry class names for its stylesheet:
+  `LoginForm` (a password, a passkey from a button or from the login field's autofill, offered
+  first on a browser that has used one), `SetupForm` (the first account, after fields of the
+  application's own), `PasskeyOffer` (setting a passkey up in one tap after a password login)
+  and `PasskeyList` (an account's passkeys, added and removed). Svelte is an optional peer
+  dependency.
+- `passkeyMemory` in `@jmerhar/jigkit/passkeys`: whether a passkey was used on this browser and
+  whether the offer to set one up was turned down, under an application's prefix.
+
+### Changed
+
+- The npm package is built with `svelte-package`, and type-checked with `svelte-check`.
+
 ## 0.8.2 — 2026-11-02
 
 ### Fixed

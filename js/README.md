@@ -8,7 +8,8 @@ same version as the Python package, whose API it talks to.
 npm install --save-exact @jmerhar/jigkit
 ```
 
-Each module is its own entry point, framework-free, and imports nothing it does not use:
+Each module is its own entry point and imports nothing it does not use; all but
+`auth/svelte` are framework-free:
 
 | Import | What it gives an interface |
 |---|---|
@@ -19,7 +20,8 @@ Each module is its own entry point, framework-free, and imports nothing it does 
 | `@jmerhar/jigkit/i18n/testing` | `catalogueProblems`, `placeholders`, `texts`: every catalogue matches the first, placeholders included, across a message's variants |
 | `@jmerhar/jigkit/api` | `ApiClient` and `ApiError`: JSON or a form in, JSON out, the write-guard header on writes, every failure with its status and the server's code |
 | `@jmerhar/jigkit/format` | euros and amounts typed either way (`parseAmount`), basis points as percentages, days, moments, calendar dates in a time zone, file sizes; the locale is always a parameter |
-| `@jmerhar/jigkit/passkeys` | `browserAuthenticator` over `@simplewebauthn/browser` (an optional peer dependency), `dismissed`, `deviceName` |
+| `@jmerhar/jigkit/passkeys` | `browserAuthenticator` over `@simplewebauthn/browser` (an optional peer dependency), `dismissed`, `deviceName`, `passkeyMemory` |
+| `@jmerhar/jigkit/auth/svelte` | `LoginForm` (password, passkey button and autofill), `SetupForm`, `PasskeyOffer`, `PasskeyList`: Svelte 5 components (an optional peer dependency) taking the app's words and API calls as props, styled by the app's own stylesheet |
 
 ```ts
 import { createLanguage } from "@jmerhar/jigkit/i18n";
@@ -39,6 +41,20 @@ class Api extends ApiClient {
   }
   items = () => this.request<Item[]>("GET", "/items");
 }
+```
+
+```svelte
+<LoginForm
+  title="My app"
+  labels={{ heading: m.login_title(), login: m.field_login(), password: m.field_password(),
+            submit: m.login_submit(), submitting: m.logging_in(), passkey: m.login_passkey(),
+            orPassword: m.login_or_password() }}
+  logIn={async (login, password) => { me = await api.logIn(login, password); }}
+  passkeys={{ options: api.passkeyLoginOptions, logIn: async (answer) => { me = await api.passkeyLogIn(answer); } }}
+  memory={passkeyMemory("myapp")}
+  {errorMessage}
+  onDone={({ offerPasskey }) => (offer = offerPasskey)}
+/>
 ```
 
 ES modules with type declarations; the TypeScript sources ship alongside. Node 22 or newer for
