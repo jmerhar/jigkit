@@ -153,6 +153,35 @@ class TestParentRebuilds:
         with pytest.raises(AssertionError, match=r"'pets': \(1, 0\)"):
             project.assert_parent_rebuilds_keep_children(sample_metadata(), data_dir, tmp_path)
 
+    def test_extra_rows_meet_a_constraint_one_row_per_table_cannot(
+        self, data_dir: Path, tmp_path: Path
+    ) -> None:
+        # A note that must not belong to the owner of pet 1: the second owner is an extra row,
+        # and the note points at it.
+        project = copy_project(tmp_path / "project")
+        add_migration(
+            project,
+            "0002",
+            "0001",
+            "op.execute('CREATE TRIGGER different BEFORE INSERT ON notes WHEN NEW.owner_id = 1 "
+            "BEGIN SELECT RAISE(ABORT, \\'the first owner takes no notes\\'); END')",
+        )
+        scratch = tmp_path / "scratch"
+        scratch.mkdir()
+
+        with pytest.raises(Exception, match="the first owner takes no notes"):
+            project.assert_parent_rebuilds_keep_children(sample_metadata(), data_dir, scratch)
+
+        again = tmp_path / "again"
+        again.mkdir()
+        project.assert_parent_rebuilds_keep_children(
+            sample_metadata(),
+            tmp_path / "data2",
+            again,
+            extra_rows={"owners": [{"id": 2, "name": "second"}]},
+            overrides={"notes": {"owner_id": 2}},
+        )
+
     def test_needs_a_table_that_something_points_at(self, data_dir: Path, tmp_path: Path) -> None:
         metadata = MetaData()
         Table("alone", metadata, Column("id", Integer, primary_key=True))

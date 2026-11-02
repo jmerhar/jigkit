@@ -27,7 +27,7 @@ import shutil
 import subprocess
 import sys
 import uuid
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, date, datetime, time, timedelta
 from decimal import Decimal
@@ -167,6 +167,7 @@ class MigrationProject:
         data_dir: Path,
         scratch: Path,
         overrides: Mapping[str, Mapping[str, Any]] | None = None,
+        extra_rows: Mapping[str, Sequence[Mapping[str, Any]]] | None = None,
     ) -> None:
         """Fail if rebuilding a table that others point at loses or orphans their rows.
 
@@ -178,6 +179,13 @@ class MigrationProject:
 
         Rows are invented from column types. ``overrides`` supplies values for columns whose
         type or constraints the generator cannot satisfy: ``{"table": {"column": value}}``.
+        ``extra_rows`` adds further rows to a table after its synthetic one, each a synthetic row
+        with the given values on top, for a constraint one row per table cannot meet -- two
+        different households for a row that must name two, say::
+
+            extra_rows={"household": [{"id": 2}]},
+            overrides={"settlement": {"to_id": 2}},
+
         ``scratch`` is an empty directory for the copy of the migrations.
         """
         parents = sorted(
@@ -190,7 +198,10 @@ class MigrationProject:
         try:
             with engine.begin() as connection:
                 for table in metadata.sorted_tables:
-                    connection.execute(table.insert().values(**synthetic_row(table, overrides)))
+                    row = synthetic_row(table, overrides)
+                    connection.execute(table.insert().values(**row))
+                    for extra in (extra_rows or {}).get(table.name, ()):
+                        connection.execute(table.insert().values(**(row | dict(extra))))
             before = _row_counts(engine, metadata)
 
             copy = self._copy_with_rebuild(scratch, parents)

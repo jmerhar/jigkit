@@ -4,6 +4,13 @@ All notable changes to jigkit are recorded here. The Python and npm packages sha
 
 ## Unreleased
 
+### Added
+
+- `MigrationProject.assert_parent_rebuilds_keep_children` takes `extra_rows`: further rows for a
+  table, each a synthetic row with the given values on top, for a constraint one row per table
+  cannot meet (a settlement between two different households, an attachment owned by exactly one
+  of two parents). `overrides` can then point a column at one of them.
+
 ## 0.3.1 — 2026-11-02
 
 ### Fixed
