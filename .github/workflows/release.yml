@@ -111,7 +111,8 @@ jobs:
           path: npm-dist
 
       - name: Publish
-        run: npm publish npm-dist/*.tgz --access public --provenance
+        # The ./ keeps npm from reading npm-dist/<file> as a GitHub owner/repository shorthand.
+        run: npm publish ./npm-dist/*.tgz --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
