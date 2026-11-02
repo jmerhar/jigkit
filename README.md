@@ -22,7 +22,7 @@ Both are released together under one version.
 ## Starting an application
 
 ```bash
-pipx run copier copy --trust gh:jmerhar/jigkit myapp
+pipx run copier copy gh:jmerhar/jigkit myapp
 cd myapp && git init && make lockfile && make install && make openapi && make check
 ```
 

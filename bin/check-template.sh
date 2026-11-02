@@ -38,7 +38,7 @@ image="$slug:template-check"
 
 echo "--- rendering $slug"
 rm -rf "$app"
-"$copier" copy --trust --defaults --vcs-ref HEAD \
+"$copier" copy --defaults --vcs-ref HEAD \
   -d app_slug="$slug" -d github_owner=example -d author="Example Author" "$root" "$app"
 cd "$app"
 git init --quiet
@@ -49,6 +49,14 @@ make install
 backend/.venv/bin/pip install --quiet -e "$root/python[auth,db,notify,passkeys,web,testing]"
 (cd "$root/js" && npm run build >/dev/null)
 (cd frontend && npm install --no-save --no-audit --no-fund "$root/js" >/dev/null)
+expected=$(grep -m1 -oE '"version": "[^"]+"' "$root/js/package.json" | cut -d'"' -f4)
+python_jigkit=$(backend/.venv/bin/python -c 'import importlib.metadata as m; print(m.version("jigkit"))')
+npm_jigkit=$(cd frontend && node -p 'require("@jmerhar/jigkit/package.json").version')
+echo "jigkit in the application: $python_jigkit (Python), $npm_jigkit (npm); this checkout: $expected"
+if [ "$npm_jigkit" != "$expected" ] || [ "${python_jigkit//.dev/-dev.}" != "$expected" ]; then
+  echo "template check: the application is not on this checkout's jigkit" >&2
+  exit 1
+fi
 make openapi
 git add --all
 git -c user.name=template-check -c user.email=template-check@example.com commit --quiet -m "rendered"

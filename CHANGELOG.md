@@ -6,8 +6,8 @@ All notable changes to jigkit are recorded here. The Python and npm packages sha
 
 ### Added
 
-- A copier template for a new application on jigkit and devtools (`copier copy --trust
-  gh:jmerhar/jigkit myapp`): a FastAPI backend and a Svelte interface with password and passkey
+- A copier template for a new application on jigkit and devtools (`copier copy gh:jmerhar/jigkit
+  myapp`): a FastAPI backend and a Svelte interface with password and passkey
   logins, first-run setup, revocable sessions, English and European Portuguese, Apprise
   notifications and a notes table, with migrations, tests at full coverage, a Dockerfile,
   compose files and a CI workflow. It pins the release it is rendered from. CI renders it and
