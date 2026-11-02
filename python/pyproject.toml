@@ -47,6 +47,12 @@ influx = [
 heartbeat = [
     "httpx2>=2.13",
 ]
+# FastAPI building blocks and uvicorn. FastAPI is held to a minor line: how it reports a matched
+# route's path has changed within a minor release before.
+web = [
+    "fastapi>=0.141,<0.144",
+    "uvicorn[standard]>=0.30",
+]
 # Notifications through Apprise.
 notify = [
     "apprise>=1.9",
@@ -58,7 +64,8 @@ testing = [
 ]
 # Everything this repository's own checks need.
 dev = [
-    "jigkit[db,heartbeat,influx,notify,testing]",
+    "jigkit[db,heartbeat,influx,notify,testing,web]",
+    "httpx>=0.28",
     "pytest-cov>=7.1",
     "ruff>=0.16",
     "build>=1.3",
