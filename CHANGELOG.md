@@ -4,6 +4,13 @@ All notable changes to jigkit are recorded here. The Python and npm packages sha
 
 ## Unreleased
 
+### Added
+
+- `jigkit.web.AccessPolicy`: a fail-closed access policy, mounted once as a global dependency.
+  Every route needs a credential (an application's own check, sync or async) unless it is
+  declared open by method and full path template; `route_templates(app)` and
+  `AccessPolicy.unknown(app)` let a test hold the declarations to the real route table.
+
 ## 0.6.0 — 2026-11-02
 
 ### Removed

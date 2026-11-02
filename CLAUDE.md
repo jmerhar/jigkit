@@ -27,8 +27,8 @@ python/src/jigkit/
   delivery.py      write now, or spool and replay oldest first; DeliveryEvents
   influx/          InfluxDB 3 and 2.x sinks, line protocol, SQL reads (extra influx)
   heartbeat.py     push-monitor heartbeat after delivered writes (extra heartbeat)
-  web/             FastAPI building blocks: guard.py, spa.py, health.py, manifest.py,
-                   server.py (serve) (extra web)
+  web/             FastAPI building blocks: access.py (AccessPolicy), guard.py, spa.py, health.py,
+                   manifest.py, server.py (serve) (extra web)
   scheduler.py     TickLoop
   notify.py        AppriseSender, redact_url (extra notify)
   ratelimit.py     RateLimiter
