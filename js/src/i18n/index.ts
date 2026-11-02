@@ -21,7 +21,7 @@ export interface ParaglideRuntime<L extends string> {
   overwriteGetLocale(getLocale: () => L): void;
   defineCustomClientStrategy(
     strategy: `custom-${string}`,
-    handler: { getLocale: () => string | undefined; setLocale: (locale: L) => void },
+    handler: { getLocale: () => string | undefined; setLocale: (locale: string) => void },
   ): void;
 }
 

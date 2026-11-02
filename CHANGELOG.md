@@ -9,7 +9,8 @@ All notable changes to jigkit are recorded here. The Python and npm packages sha
 - `@jmerhar/jigkit`, the npm package, with one entry point per module: `storage` (local storage
   that never throws), `theme` (`applyTheme`, `chosenTheme`, `chooseTheme`), `i18n`
   (`createLanguage` over an application's Paraglide runtime, `match`), `i18n/build`
-  (`paraglideOptions`), `i18n/testing` (`catalogueProblems`, `placeholders`), `api` (`ApiClient`,
+  (`paraglideOptions`), `i18n/testing` (`catalogueProblems`, which reads messages with variants and can let a translation
+  leave placeholders out, `placeholders`, `texts`), `api` (`ApiClient`,
   `ApiError`, `writeHeader`), `format` (euros, `parseAmount`, percentages in basis points, days,
   moments, `calendarDate`, `whichDay`, `zoneCity`, `fileSize`) and `passkeys`
   (`browserAuthenticator`, `dismissed`, `deviceName`).

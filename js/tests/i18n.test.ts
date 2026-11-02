@@ -1,14 +1,14 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createLanguage, match, type ParaglideRuntime } from "../src/i18n";
 import { paraglideOptions, STRATEGY } from "../src/i18n/build";
-import { catalogueProblems, placeholders } from "../src/i18n/testing";
+import { catalogueProblems, placeholders, texts } from "../src/i18n/testing";
 import { MemoryStorage } from "./helpers";
 
 type Locale = "en" | "pt-PT";
 
 /** A stand-in for an application's generated Paraglide runtime. */
 function runtime(current: Locale = "en") {
-  const strategies = new Map<string, { getLocale: () => string | undefined; setLocale: (l: Locale) => void }>();
+  const strategies = new Map<string, { getLocale: () => string | undefined; setLocale: (l: string) => void }>();
   let getLocale = () => current;
   const fake: ParaglideRuntime<Locale> & { strategies: typeof strategies } = {
     baseLocale: "en",
@@ -194,6 +194,31 @@ describe("catalogue checks", () => {
       "pt: bye is missing",
       "pt: count is not text",
       "pt: extra is not in en",
+    ]);
+  });
+
+  it("reads a message's variants", () => {
+    const variants = [{ declarations: ["input n"], selectors: ["n"], match: { "n=1": "one {n}", "n=*": "{n} {unit}" } }];
+    expect(texts("plain")).toEqual(["plain"]);
+    expect(texts(variants)).toEqual(["one {n}", "{n} {unit}"]);
+    expect(texts(5)).toBeNull();
+    expect(texts([{ selectors: [] }])).toBeNull();
+    expect(texts([null])).toBeNull();
+    expect(texts([{ match: { a: 1 } }])).toBeNull();
+  });
+
+  it("compares the placeholders across all of a message's variants", () => {
+    const en = { count: [{ match: { "n=1": "one item", "n=*": "{n} items" } }] };
+    expect(catalogueProblems({ en, pt: { count: [{ match: { "n=*": "{n} itens" } }] } })).toEqual([]);
+    expect(catalogueProblems({ en, pt: { count: "itens" } })).toEqual(["pt: count fills in {} where en fills in {n}"]);
+    expect(catalogueProblems({ en, pt: { count: [{ match: 3 }] } })).toEqual(["pt: count is not text"]);
+  });
+
+  it("lets a translation leave placeholders out when told to, but never add one", () => {
+    const en = { zone: "{city} time" };
+    expect(catalogueProblems({ en, pt: { zone: "hora local" } }, { allowFewer: true })).toEqual([]);
+    expect(catalogueProblems({ en, pt: { zone: "hora de {place}" } }, { allowFewer: true })).toEqual([
+      "pt: zone fills in {place} where en fills in {city}",
     ]);
   });
 });
