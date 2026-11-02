@@ -1,6 +1,6 @@
 {
   "name": "@jmerhar/jigkit",
-  "version": "0.10.0",
+  "version": "0.11.0-dev.0",
   "description": "The shared browser foundations of small self-hosted web apps: theme, language, API client, formatting, passkeys, and Svelte login screens",
   "license": "MIT",
   "author": "Jure Merhar",
