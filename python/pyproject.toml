@@ -47,6 +47,10 @@ influx = [
 heartbeat = [
     "httpx2>=2.13",
 ]
+# Notifications through Apprise.
+notify = [
+    "apprise>=1.9",
+]
 # The pytest plugin: fixtures and migration checks for applications built on jigkit.
 testing = [
     "pytest>=9.1",
@@ -54,7 +58,7 @@ testing = [
 ]
 # Everything this repository's own checks need.
 dev = [
-    "jigkit[db,heartbeat,influx,testing]",
+    "jigkit[db,heartbeat,influx,notify,testing]",
     "pytest-cov>=7.1",
     "ruff>=0.16",
     "build>=1.3",
