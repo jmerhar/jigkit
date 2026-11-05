@@ -1,8 +1,14 @@
-"""{{ app_title }}: {{ description }}."""
+"""{{ app_title }}, a FastAPI backend and the interface it serves.
 
-from importlib.metadata import PackageNotFoundError, version
+The version and the one-line summary are read from the installed package's metadata, which
+pyproject.toml sets, so they are written in one place.
+"""
+
+from importlib.metadata import PackageNotFoundError, metadata, version
 
 try:
     __version__ = version("{{ app_slug }}")
+    __summary__ = metadata("{{ app_slug }}")["Summary"] or ""
 except PackageNotFoundError:  # pragma: no cover - only when run from an uninstalled source tree
     __version__ = "0.0.0"
+    __summary__ = ""

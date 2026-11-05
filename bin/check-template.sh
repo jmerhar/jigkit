@@ -3,8 +3,8 @@
 #
 # The application gets jigkit as it stands in this checkout in place of the release the template
 # pins, so a change here that breaks an application built on jigkit fails before it is released.
-# It is given a long name, which shows any line whose length depends on the name. Then:
-# `make lockfile`, `make install`, `make openapi`, a first commit, the application's whole
+# It is given a long name and description, which shows any line whose length depends on them.
+# Then: `make lockfile`, `make install`, `make openapi`, a first commit, the application's whole
 # `make check`, and its image, built and started until its health check reports the database.
 #
 # Usage: bin/check-template.sh [DIR]    (needs copier, Docker, Python 3.14 and Node 24)
@@ -17,6 +17,8 @@ root="$(cd "$(dirname "$0")/.." && pwd)"
 copier="${COPIER:-copier}"
 port="${PORT:-18080}"
 slug="household-inventory-tracker"
+# Long enough to break any line of code it is written into.
+description="Every item in the household, where it is kept, what it cost and when its warranty ends"
 
 work=""
 container=""
@@ -39,7 +41,8 @@ image="$slug:template-check"
 echo "--- rendering $slug"
 rm -rf "$app"
 "$copier" copy --defaults --vcs-ref HEAD \
-  -d app_slug="$slug" -d github_owner=example -d author="Example Author" "$root" "$app"
+  -d app_slug="$slug" -d github_owner=example -d author="Example Author" \
+  -d description="$description" "$root" "$app"
 cd "$app"
 git init --quiet
 

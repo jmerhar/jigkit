@@ -8,7 +8,7 @@ from jigkit.notify import Sender
 from jigkit.web import health_router, install_security_headers, install_write_guard, mount_spa
 from sqlalchemy import text
 
-from .. import __version__
+from .. import __summary__, __version__
 from ..auth import WRITE_HEADER_VALUE
 from ..config import Settings, get_settings
 from .deps import build_services
@@ -35,7 +35,7 @@ def create_app(settings: Settings | None = None, sender: Sender | None = None) -
 
     app = FastAPI(
         title="{{ app_title }}",
-        summary="{{ description }}",
+        summary=__summary__,
         version=__version__,
         lifespan=lifespan,
         docs_url=f"{API_PREFIX}/docs",

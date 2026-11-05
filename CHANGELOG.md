@@ -4,6 +4,12 @@ All notable changes to jigkit are recorded here. The Python and npm packages sha
 
 ## Unreleased
 
+### Fixed
+
+- An application rendered from the template with a long description passes its own lint: the
+  description is no longer written into Python source, and the API's summary is read from the
+  package metadata pyproject.toml sets. The template check renders with a long description.
+
 ## 0.10.0 — 2026-11-02
 
 ### Added
