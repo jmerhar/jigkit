@@ -14,7 +14,6 @@ All notable changes to jigkit are recorded here. The Python and npm packages sha
   figures at a glance (`kpis`), and a header whose navigation, with drop-down groups
   (`nav-menu`), folds behind a menu button on a narrow screen. The class names are the ones the
   Svelte login components carry.
-- The template imports it, and its header folds behind a menu button on a narrow screen.
 
 ### Fixed
 

@@ -20,13 +20,6 @@
   /** What the app is showing. */
   let stage = $state<"loading" | "setup" | "login" | "ready" | "error">("loading");
   let page = $state<"notes" | "account">("notes");
-  /** Whether the navigation is unfolded, on a screen too narrow to show it all. */
-  let menuOpen = $state(false);
-
-  function show(next: "notes" | "account"): void {
-    page = next;
-    menuOpen = false;
-  }
   let me = $state<Me | null>(null);
   let problem = $state("");
   let offerPasskey = $state(false);
@@ -128,21 +121,13 @@
     }}
   />
 {:else if me}
-  <header class="site-header" data-open={menuOpen || undefined}>
-    <strong class="brand">{m.app_name()}</strong>
-    <button
-      type="button"
-      class="secondary small menu-toggle"
-      aria-expanded={menuOpen}
-      onclick={() => (menuOpen = !menuOpen)}
-    >
-      {m.nav_menu()}
-    </button>
-    <nav class="site-nav">
-      <button type="button" class="link" aria-current={page === "notes"} onclick={() => show("notes")}>
+  <header>
+    <strong>{m.app_name()}</strong>
+    <nav>
+      <button type="button" class="link" aria-current={page === "notes"} onclick={() => (page = "notes")}>
         {m.nav_notes()}
       </button>
-      <button type="button" class="link" aria-current={page === "account"} onclick={() => show("account")}>
+      <button type="button" class="link" aria-current={page === "account"} onclick={() => (page = "account")}>
         {m.nav_account()}
       </button>
       <button type="button" class="link" onclick={logOut}>{m.log_out()}</button>
