@@ -4,6 +4,12 @@ All notable changes to jigkit are recorded here. The Python and npm packages sha
 
 ## Unreleased
 
+### Fixed
+
+- The base stylesheet draws a drop-down menu's arrow as a chevron that points down while closed
+  and up while open; its two halves were drawn on the wrong sides. A select's arrow is the same
+  chevron, in each theme's muted colour.
+
 ### Changed
 
 - The template imports the base stylesheet in place of its own copy, and its header folds

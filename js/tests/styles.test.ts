@@ -25,6 +25,7 @@ describe("the base stylesheet", () => {
   it("gives the dark themes every colour the light one has", () => {
     const light = properties(rule(":root"));
     const colours = light.filter((name) => !["--radius", "--control-radius", "--page-width"].includes(name));
+    expect(colours).toContain("--select-arrow");
     const darkDevice = properties(rule(':root:not([data-theme="light"])'));
     const darkChosen = properties(rule(':root[data-theme="dark"]'));
 
@@ -37,6 +38,17 @@ describe("the base stylesheet", () => {
 
     expect(select).toContain("appearance: none");
     expect(select).toMatch(/padding-right: 2\.25rem/);
-    expect(select).toMatch(/background-position:\s*right 1\.05rem center,\s*right 0\.75rem center/);
+    expect(select).toContain("background-image: var(--select-arrow)");
+    expect(select).toContain("background-position: right 0.8rem center");
+  });
+
+  it("draws a menu's chevron as a turned corner, pointing down until it opens", () => {
+    const closed = rule(".nav-menu > summary::after");
+    const open = rule(".nav-menu[open] > summary::after");
+
+    expect(closed).toMatch(/border-right: 1\.5px solid var\(--muted\)/);
+    expect(closed).toMatch(/border-bottom: 1\.5px solid var\(--muted\)/);
+    expect(closed).toContain("transform: rotate(45deg)");
+    expect(open).toContain("transform: rotate(-135deg)");
   });
 });
