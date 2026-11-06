@@ -5,7 +5,8 @@
 # pins, so a change here that breaks an application built on jigkit fails before it is released.
 # It is given a long name and description, which shows any line whose length depends on them.
 # Then: `make lockfile`, `make install`, `make openapi`, a first commit, the application's whole
-# `make check`, and its image, built and started until its health check reports the database.
+# `make check`, its CI configuration through the shared workflow's planner and actionlint, and its
+# image, built and started until its health check reports the database.
 #
 # Usage: bin/check-template.sh [DIR]    (needs copier, Docker, Python 3.14 and Node 24)
 #   DIR      where the application is rendered (default: a temporary directory, removed after)
@@ -66,6 +67,11 @@ git -c user.name=template-check -c user.email=template-check@example.com commit 
 
 echo "--- make check"
 make check
+
+echo "--- CI"
+# The [ci] section passes the planner the shared workflow runs, and the workflow passes actionlint.
+python3 .devtools/bin/ci.py plan --event push --ref refs/heads/main --default-branch main >/dev/null
+docker run --rm -v "$app:/repo" -w /repo rhysd/actionlint:1.7.7 -no-color -oneline
 
 echo "--- the image"
 docker build --quiet -t "$image" . >/dev/null
