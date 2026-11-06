@@ -1,23 +1,12 @@
-# Shared by the package, its tests, and the scripts in bin/.
-line-length = 100
-target-version = "py314"
+# Shared by the package, its tests, and the scripts in bin/. The rules come from jmerhar/devtools.
+extend = ".devtools/config/ruff.toml"
 # The template is linted as the application it renders into, with that application's rules
 # (bin/check-template.sh), and most of its Python is Jinja until then.
 extend-exclude = ["template"]
 
-[lint]
-# On top of the defaults (pyflakes and pycodestyle errors): import order, unused arguments,
-# comprehension and builtin misuse, pyupgrade, simplifications, and the bug-prone patterns in
-# flake8-bugbear.
-select = ["E", "F", "W", "I", "B", "C4", "UP", "ARG", "SIM"]
-
-[lint.per-file-ignores]
-# A pytest fixture is often requested for what it does rather than for its value, and naming it
-# in the signature is the only way to ask for it.
-"python/tests/**" = ["ARG001", "ARG002"]
-# Written by `alembic revision --autogenerate`; reflowing them by hand would be undone by the next
-# generated migration.
-"python/tests/sample_app/alembic/versions/*" = ["E501", "UP035", "UP007", "I001"]
+[lint.extend-per-file-ignores]
+# The sample application's generated migrations, written in the style Alembic generates.
+"python/tests/sample_app/alembic/versions/*" = ["UP035", "UP007"]
 
 [lint.isort]
 known-first-party = ["jigkit"]
