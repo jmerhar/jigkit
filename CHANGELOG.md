@@ -4,6 +4,11 @@ All notable changes to jigkit are recorded here. The Python and npm packages sha
 
 ## Unreleased
 
+### Changed
+
+- The template imports the base stylesheet in place of its own copy, and its header folds
+  behind a menu button on a narrow screen.
+
 ## 0.11.0 — 2026-11-06
 
 ### Added
