@@ -1,0 +1,763 @@
+/*
+ * jigkit's base stylesheet: the look every application shares, so a fix to a form control or a
+ * table lands in all of them. An application imports it first and adds its own rules after:
+ *
+ *     @import "@jmerhar/jigkit/styles/base.css";
+ *
+ * Colours are custom properties on :root, light by default and dark for a device set to dark or
+ * a chosen dark theme (<html data-theme>, which @jmerhar/jigkit/theme sets). An application
+ * changes its palette by redefining them after the import.
+ *
+ * The class names are the ones jigkit's Svelte components carry (card, narrow, actions,
+ * secondary, link, muted, or, other-login, wide-button, note, offer, list, what) and a few
+ * general ones: site-header, site-nav, nav-gap, nav-menu, nav-menu-items, menu-toggle, tabs,
+ * kpis, kpi, alert, tag, chips, chip, grid tables, num, pos, neg, nowrap, field-row,
+ * table-scroll, hide-narrow, sr-only.
+ */
+
+:root {
+  --bg: #f7f6f2;
+  --surface: #ffffff;
+  --text: #1d2321;
+  --muted: #5f6b67;
+  --line: #d9dcd6;
+  --accent: #2f6f5e;
+  --accent-text: #ffffff;
+  --accent-soft: #e6f0ec;
+  --danger: #a3302a;
+  --danger-bg: #fbeceb;
+  --positive: #1f7a4d;
+  --positive-bg: #e8f4ee;
+  --warning: #9a6a12;
+  --warning-bg: #fbf3e2;
+  --radius: 0.75rem;
+  --control-radius: 0.5rem;
+  /* The width the page's content keeps to. */
+  --page-width: 76rem;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #17191b;
+    --surface: #212427;
+    --text: #e8ebe9;
+    --muted: #9aa5a1;
+    --line: #353a3e;
+    --accent: #6fbfa6;
+    --accent-text: #0f1a16;
+    --accent-soft: #1d2d28;
+    --danger: #f08a83;
+    --danger-bg: #331d1c;
+    --positive: #7fcf9f;
+    --positive-bg: #18291f;
+    --warning: #e6b862;
+    --warning-bg: #2e2716;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #17191b;
+  --surface: #212427;
+  --text: #e8ebe9;
+  --muted: #9aa5a1;
+  --line: #353a3e;
+  --accent: #6fbfa6;
+  --accent-text: #0f1a16;
+  --accent-soft: #1d2d28;
+  --danger: #f08a83;
+  --danger-bg: #331d1c;
+  --positive: #7fcf9f;
+  --positive-bg: #18291f;
+  --warning: #e6b862;
+  --warning-bg: #2e2716;
+  color-scheme: dark;
+}
+
+/* The page. */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.5 system-ui, sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+
+main {
+  max-width: var(--page-width);
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+h1 {
+  margin: 0.5rem 0 1rem;
+  font-size: 1.75rem;
+  line-height: 1.2;
+}
+
+h2 {
+  font-size: 1.125rem;
+}
+
+a {
+  color: var(--accent);
+  text-underline-offset: 0.15em;
+}
+
+.muted,
+small {
+  color: var(--muted);
+}
+
+.lead {
+  max-width: 48rem;
+  margin-top: 0;
+  color: var(--muted);
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.num {
+  text-align: right !important;
+  font-variant-numeric: tabular-nums;
+}
+
+.pos {
+  color: var(--positive);
+}
+
+.neg {
+  color: var(--danger);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+[role="alert"] {
+  color: var(--danger);
+}
+
+/*
+ * The header: the application's name, its navigation, and anything after it (a search box).
+ * On a narrow screen the navigation folds behind a menu-toggle button, open while the header
+ * carries data-open; the application toggles the attribute.
+ */
+
+.site-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  align-items: center;
+  padding: 0.625rem 1rem;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.site-header .brand {
+  color: inherit;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.site-nav {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  gap: 0.125rem;
+  align-items: center;
+}
+
+.site-nav a,
+.site-nav button.link {
+  padding: 0.375rem 0.625rem;
+  border-radius: var(--control-radius);
+  color: var(--text);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.site-nav a:hover,
+.site-nav button.link:hover {
+  background: var(--accent-soft);
+}
+
+.site-nav [aria-current="page"],
+.site-nav [aria-current="true"] {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* A gap before a group of links, such as the ones only an administrator sees. */
+.site-nav .nav-gap {
+  width: 1px;
+  height: 1.25rem;
+  margin: 0 0.375rem;
+  background: var(--line);
+}
+
+/*
+ * A group of links under one name in the navigation: a <details class="nav-menu"> whose
+ * <summary> names it and whose .nav-menu-items holds the links. It drops down beneath the bar,
+ * and unfolds in place when the navigation is folded behind the menu toggle.
+ */
+.nav-menu {
+  position: relative;
+}
+
+.nav-menu > summary {
+  display: flex;
+  gap: 0.375rem;
+  align-items: center;
+  padding: 0.375rem 0.625rem;
+  border-radius: var(--control-radius);
+  color: var(--text);
+  list-style: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.nav-menu > summary::-webkit-details-marker {
+  display: none;
+}
+
+/* The same drawn arrow as a select's. */
+.nav-menu > summary::after {
+  content: "";
+  width: 0.6rem;
+  height: 0.3rem;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+    linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position:
+    right 0 center,
+    left 0 center;
+  background-size: 0.3rem 0.3rem;
+  background-repeat: no-repeat;
+}
+
+.nav-menu > summary:hover,
+.nav-menu[open] > summary {
+  background: var(--accent-soft);
+}
+
+.nav-menu > summary[aria-current="page"] {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.nav-menu-items {
+  position: absolute;
+  top: calc(100% + 0.25rem);
+  left: 0;
+  z-index: 10;
+  display: grid;
+  min-width: 11rem;
+  padding: 0.25rem;
+  border: 1px solid var(--line);
+  border-radius: var(--control-radius);
+  background: var(--surface);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.12);
+}
+
+.nav-menu-items.end {
+  right: 0;
+  left: auto;
+}
+
+.nav-menu-items a,
+.nav-menu-items button.link {
+  text-align: left;
+}
+
+.menu-toggle {
+  display: none;
+}
+
+@media (max-width: 56rem) {
+  .menu-toggle {
+    display: inline-flex;
+    margin-left: auto;
+  }
+
+  .site-nav {
+    display: none;
+    flex-basis: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    padding-top: 0.25rem;
+  }
+
+  .site-header[data-open] .site-nav {
+    display: flex;
+  }
+
+  .site-nav .nav-gap {
+    width: auto;
+    height: 1px;
+    margin: 0.25rem 0;
+  }
+
+  .nav-menu-items,
+  .nav-menu-items.end {
+    position: static;
+    min-width: 0;
+    margin-left: 0.75rem;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+  }
+}
+
+/* Tabs: sections of one page, each a link, the shown one marked aria-current="page". */
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin: 0 0 1rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.tabs a {
+  margin-bottom: -1px;
+  padding: 0.5rem 0.875rem;
+  border-bottom: 2px solid transparent;
+  color: var(--muted);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.tabs a:hover {
+  color: var(--text);
+}
+
+.tabs a[aria-current="page"] {
+  border-bottom-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* Forms. */
+
+label {
+  display: grid;
+  gap: 0.25rem;
+}
+
+input,
+select,
+textarea {
+  min-width: 0;
+  font: inherit;
+  padding: 0.5rem 0.625rem;
+  border: 1px solid var(--line);
+  border-radius: var(--control-radius);
+  background-color: var(--bg);
+  color: inherit;
+}
+
+textarea {
+  resize: vertical;
+}
+
+/*
+ * The native arrow sits flush against a select's edge whatever its padding, so it is drawn
+ * here instead, from two gradients in the muted colour, which follows the theme.
+ */
+select {
+  appearance: none;
+  padding-right: 2.25rem;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+    linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position:
+    right 1.05rem center,
+    right 0.75rem center;
+  background-size: 0.3rem 0.3rem;
+  background-repeat: no-repeat;
+}
+
+select[multiple] {
+  padding-right: 0.625rem;
+  background-image: none;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  width: 1.125rem;
+  height: 1.125rem;
+  margin: 0;
+  padding: 0;
+  accent-color: var(--accent);
+}
+
+input[type="color"] {
+  width: 3rem;
+  height: 2.375rem;
+  padding: 0.25rem;
+  cursor: pointer;
+}
+
+input[type="file"] {
+  padding: 0.3rem;
+}
+
+input[type="file"]::file-selector-button {
+  margin-right: 0.625rem;
+  padding: 0.3rem 0.75rem;
+  border: 1px solid var(--accent);
+  border-radius: calc(var(--control-radius) - 0.125rem);
+  background: transparent;
+  color: var(--accent);
+  font: inherit;
+  cursor: pointer;
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+button:focus-visible,
+a:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* A checkbox or radio beside its text, rather than above it. */
+label:has(> input[type="checkbox"]),
+label:has(> input[type="radio"]) {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* Fields side by side, aligned on their inputs whatever their labels, wrapping when narrow. */
+.field-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: end;
+}
+
+.field-row > .grow {
+  flex: 1 1 14rem;
+}
+
+/* Buttons. */
+
+button {
+  font: inherit;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--accent);
+  border-radius: var(--control-radius);
+  background: var(--accent);
+  color: var(--accent-text);
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+button.secondary {
+  background: transparent;
+  color: var(--accent);
+}
+
+button.danger {
+  border-color: var(--danger);
+  background: transparent;
+  color: var(--danger);
+}
+
+button.small {
+  padding: 0.25rem 0.625rem;
+  font-size: 0.875rem;
+}
+
+button.link {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+button.link[aria-current="true"] {
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.site-nav button.link {
+  text-decoration: none;
+}
+
+.wide-button {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* Cards. */
+
+.card {
+  display: grid;
+  gap: 0.75rem;
+  margin: 1rem 0;
+  padding: 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.card > h2,
+.card > h3 {
+  margin: 0;
+}
+
+.card > p {
+  margin: 0;
+}
+
+/* A button that is a card's own child keeps its size rather than stretching across. */
+.card > button {
+  justify-self: start;
+}
+
+.narrow {
+  max-width: 24rem;
+  margin: 3rem auto;
+}
+
+@media (max-width: 40rem) {
+  main {
+    padding: 0.75rem;
+  }
+
+  .card {
+    padding: 1rem;
+  }
+}
+
+/* Lists, notes and the login components' pieces. */
+
+.or,
+.other-login {
+  margin: 0;
+  text-align: center;
+}
+
+.note {
+  margin: 1rem 0;
+  padding: 1rem;
+  border-left: 4px solid var(--accent);
+  background: var(--surface);
+}
+
+.list {
+  margin: 1rem 0;
+  padding: 0;
+  list-style: none;
+}
+
+.list li {
+  display: flex;
+  gap: 1rem;
+  align-items: baseline;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.what {
+  display: grid;
+  flex: 1;
+}
+
+/* Figures at a glance. */
+
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.kpi {
+  display: grid;
+  align-content: start;
+  gap: 0.25rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.kpi.accent {
+  border-color: var(--accent);
+}
+
+.kpi-label,
+.kpi-foot {
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.kpi-value {
+  font-size: 1.5rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Alerts. */
+
+.alert {
+  margin: 0.75rem 0;
+  padding: 0.75rem 1rem;
+  border-left: 4px solid var(--muted);
+  border-radius: 0.25rem;
+  background: var(--surface);
+}
+
+.alert.ok {
+  border-color: var(--positive);
+  background: var(--positive-bg);
+}
+
+.alert.warn {
+  border-color: var(--warning);
+  background: var(--warning-bg);
+}
+
+.alert.bad {
+  border-color: var(--danger);
+  background: var(--danger-bg);
+}
+
+.alert ul {
+  margin: 0.5rem 0 0;
+  padding-left: 1.25rem;
+}
+
+/* Tags and chips. */
+
+.tag {
+  display: inline-block;
+  padding: 0 0.4rem;
+  border: 1px solid var(--line);
+  border-radius: 0.25rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  white-space: nowrap;
+  vertical-align: 0.05em;
+}
+
+.tag.warn {
+  border-color: var(--warning);
+  color: var(--warning);
+}
+
+.tag.accent {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  align-items: center;
+  margin: 0.75rem 0;
+}
+
+.chip {
+  padding: 0.125rem 0.625rem;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.875rem;
+  text-decoration: none;
+}
+
+.chip:hover {
+  border-color: var(--accent);
+}
+
+.chip[aria-current="page"] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+/* Tables. */
+
+/* Positioned, so what is placed absolutely inside it (a visually hidden label) is clipped with it. */
+.table-scroll {
+  position: relative;
+  overflow-x: auto;
+}
+
+table.grid {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+}
+
+table.grid th,
+table.grid td {
+  padding: 0.45rem 0.6rem;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+table.grid th {
+  color: var(--muted);
+  font-weight: 600;
+  vertical-align: bottom;
+}
+
+table.grid .total-row td {
+  font-weight: 600;
+  border-top: 2px solid var(--line);
+}
+
+/* A column a narrow screen can do without. */
+@media (max-width: 40rem) {
+  .hide-narrow {
+    display: none;
+  }
+}
+
+/* A disclosure's summary, styled as a quiet link. */
+details > summary {
+  color: var(--muted);
+  cursor: pointer;
+}

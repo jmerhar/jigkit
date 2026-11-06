@@ -10,6 +10,9 @@ export default defineConfig({
     environment: "jsdom",
     include: ["tests/**/*.test.ts"],
     setupFiles: ["tests/setup.ts"],
+    // The base stylesheet is read as text by its test, which needs CSS processed rather than
+    // replaced by an empty module.
+    css: { include: [/styles\/base\.css/] },
     coverage: {
       provider: "v8",
       include: ["src/**/*.{ts,svelte}"],

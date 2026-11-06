@@ -71,8 +71,14 @@ describe("starting", () => {
     render(App, { api, authenticator: fakeAuthenticator() });
 
     await screen.findByRole("heading", { name: "Notes" });
+    const menu = screen.getByRole("button", { name: "Menu" });
+    expect(menu).toHaveAttribute("aria-expanded", "false");
+    await fireEvent.click(menu);
+    expect(menu).toHaveAttribute("aria-expanded", "true");
+    expect(menu.closest("header")).toHaveAttribute("data-open");
     await fireEvent.click(screen.getByRole("button", { name: "Account" }));
     expect(await screen.findByRole("heading", { name: "Account" })).toBeInTheDocument();
+    expect(menu).toHaveAttribute("aria-expanded", "false");
     await fireEvent.click(screen.getByRole("button", { name: "Notes" }));
     expect(await screen.findByRole("heading", { name: "Notes" })).toBeInTheDocument();
   });

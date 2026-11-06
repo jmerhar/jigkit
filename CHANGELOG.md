@@ -4,6 +4,18 @@ All notable changes to jigkit are recorded here. The Python and npm packages sha
 
 ## Unreleased
 
+### Added
+
+- `@jmerhar/jigkit/styles/base.css`, a base stylesheet an application imports before its own
+  rules: the colours as custom properties (light, and dark for the device or a chosen theme),
+  form controls (a select's arrow is drawn clear of its edge rather than the native one, and
+  checkboxes, colour and file inputs are sized to match), buttons (`secondary`, `danger`,
+  `link`, `small`), cards, `grid` tables with a scroll container, alerts, tags, chips, tabs,
+  figures at a glance (`kpis`), and a header whose navigation, with drop-down groups
+  (`nav-menu`), folds behind a menu button on a narrow screen. The class names are the ones the
+  Svelte login components carry.
+- The template imports it, and its header folds behind a menu button on a narrow screen.
+
 ### Fixed
 
 - An application rendered from the template with a long description passes its own lint: the
