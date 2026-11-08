@@ -49,6 +49,22 @@ export interface SetupDetails {
   password: string;
 }
 
+export interface WelcomeLabels {
+  heading: string;
+  /** What the link is for, such as "Choose a password for your account, Ana." */
+  intro: string;
+  /** The login the account has, shown so the person knows what to log in with. */
+  login: string;
+  password: string;
+  passwordHint: string;
+  /** The password again. */
+  repeat: string;
+  /** Said when the two passwords differ. */
+  mismatch: string;
+  submit: string;
+  submitting: string;
+}
+
 export interface PasskeyOfferLabels {
   offer: string;
   done: string;

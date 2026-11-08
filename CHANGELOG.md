@@ -4,6 +4,15 @@ All notable changes to jigkit are recorded here. The Python and npm packages sha
 
 ## Unreleased
 
+### Added
+
+- `jigkit.auth.invitations`: `InvitationMixin` and `InvitationStore`, one-time links for
+  someone to choose their own password, for an account an administrator made or to reset one.
+  Only the token's hash is kept, an owner has at most one live invitation, and redeeming it
+  deletes it.
+- `WelcomeForm` in `@jmerhar/jigkit/auth/svelte`: choosing a password from such a link, typed
+  twice, with the account's login shown.
+
 ## 0.12.0 — 2026-11-06
 
 ### Fixed

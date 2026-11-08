@@ -42,15 +42,16 @@ python/src/jigkit/
   notify.py        AppriseSender, redact_url (extra notify)
   ratelimit.py     RateLimiter
   auth/            passwords.py, throttle.py, cookies.py (extra auth); sessions.py
-                   (SessionMixin, SessionStore; extras auth and db); passkeys.py (extras
+                   (SessionMixin, SessionStore; extras auth and db); invitations.py
+                   (InvitationMixin, InvitationStore; extras auth and db); passkeys.py (extras
                    passkeys and db)
   testing/         pytest plugin (data_dir, no_network), migration checks, stand-in HTTP server,
                    RecordingSender, SoftAuthenticator (passkeys.py)
 python/tests/
   sample_app/      a small application with its own Alembic project, for the migration tests
 js/src/            the npm package: storage.ts, theme.ts, i18n/ (index, build, testing), api.ts,
-                   format.ts, passkeys.ts, auth/svelte/ (Svelte components); one subpath export
-                   each, built by svelte-package
+                   format.ts, passkeys.ts, auth/svelte/ (Svelte components), styles/base.css;
+                   one subpath export each, built by svelte-package
 js/tests/          Vitest, in jsdom
 copier.yml         the template's questions; template/ is what it renders
 template/          a new application (backend, frontend, Dockerfile, CI); *.jinja files are

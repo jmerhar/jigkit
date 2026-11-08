@@ -21,7 +21,8 @@ Each module is its own entry point and imports nothing it does not use; all but
 | `@jmerhar/jigkit/api` | `ApiClient` and `ApiError`: JSON or a form in, JSON out, the write-guard header on writes, every failure with its status and the server's code |
 | `@jmerhar/jigkit/format` | euros and amounts typed either way (`parseAmount`), basis points as percentages, days, moments, calendar dates in a time zone, file sizes; the locale is always a parameter |
 | `@jmerhar/jigkit/passkeys` | `browserAuthenticator` over `@simplewebauthn/browser` (an optional peer dependency), `dismissed`, `deviceName`, `passkeyMemory` |
-| `@jmerhar/jigkit/auth/svelte` | `LoginForm` (password, passkey button and autofill), `SetupForm`, `PasskeyOffer`, `PasskeyList`: Svelte 5 components (an optional peer dependency) taking the app's words and API calls as props, styled by the app's own stylesheet |
+| `@jmerhar/jigkit/auth/svelte` | `LoginForm` (password, passkey button and autofill), `SetupForm`, `WelcomeForm` (a password chosen from an invitation or reset link), `PasskeyOffer`, `PasskeyList`: Svelte 5 components (an optional peer dependency) taking the app's words and API calls as props, styled by the app's own stylesheet |
+| `@jmerhar/jigkit/styles/base.css` | the shared stylesheet, imported first by the app's own: colour tokens for light and dark, form controls, buttons, cards, tables, alerts, tags, chips, tabs, figure tiles, and a header whose navigation has drop-down groups and folds behind a menu button |
 
 ```ts
 import { createLanguage } from "@jmerhar/jigkit/i18n";

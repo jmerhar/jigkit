@@ -2,7 +2,15 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/svelte";
 import { createRawSnippet } from "svelte";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ApiError } from "../src/api";
-import { alreadyAdded, LoginForm, PasskeyList, PasskeyOffer, SetupForm, type PasskeyItem } from "../src/auth/svelte";
+import {
+  alreadyAdded,
+  LoginForm,
+  PasskeyList,
+  PasskeyOffer,
+  SetupForm,
+  WelcomeForm,
+  type PasskeyItem,
+} from "../src/auth/svelte";
 import { passkeyMemory } from "../src/passkeys";
 import { autofilling, errorMessage, fakeAuthenticator, LIST, LOGIN, named, OFFER, SETUP } from "./auth.helpers";
 import { MemoryStorage } from "./helpers";
@@ -216,6 +224,62 @@ describe("SetupForm", () => {
     expect(screen.getByLabelText(/^Password/)).toHaveAttribute("minlength", "10");
     await fireEvent.submit(screen.getByRole("button", { name: "Create" }).closest("form")!);
     expect(await screen.findByRole("alert")).toHaveTextContent("failed: already_set_up");
+    expect(onDone).not.toHaveBeenCalled();
+  });
+});
+
+const WELCOME = {
+  heading: "Welcome",
+  intro: "Choose a password for your account, Ana.",
+  login: "Username",
+  password: "Password",
+  passwordHint: "At least 10 characters.",
+  repeat: "The password again",
+  mismatch: "The two passwords differ.",
+  submit: "Save the password",
+  submitting: "Saving…",
+};
+
+describe("WelcomeForm", () => {
+  it("shows the login, and sets the password typed twice", async () => {
+    const accept = vi.fn(async () => undefined);
+    const onDone = vi.fn();
+    render(WelcomeForm, { labels: WELCOME, login: "ana", accept, errorMessage, onDone, minPasswordLength: 12 });
+
+    expect(screen.getByLabelText("Username")).toHaveValue("ana");
+    expect(screen.getByLabelText("Username")).toHaveAttribute("readonly");
+    expect(screen.getByLabelText(/^Password/)).toHaveAttribute("minlength", "12");
+    await fireEvent.input(screen.getByLabelText(/^Password/), { target: { value: "a long password" } });
+    await fireEvent.input(screen.getByLabelText("The password again"), { target: { value: "a long password" } });
+    await fireEvent.submit(screen.getByRole("button", { name: "Save the password" }).closest("form")!);
+
+    expect(accept).toHaveBeenCalledWith("a long password");
+    await waitFor(() => expect(onDone).toHaveBeenCalledOnce());
+  });
+
+  it("refuses two different passwords without asking the server", async () => {
+    const accept = vi.fn(async () => undefined);
+    render(WelcomeForm, { labels: WELCOME, login: "ana", accept, errorMessage, onDone: vi.fn() });
+    await fireEvent.input(screen.getByLabelText(/^Password/), { target: { value: "a long password" } });
+    await fireEvent.input(screen.getByLabelText("The password again"), { target: { value: "a long passwerd" } });
+    await fireEvent.submit(screen.getByRole("button", { name: "Save the password" }).closest("form")!);
+
+    expect(screen.getByRole("alert")).toHaveTextContent("The two passwords differ.");
+    expect(accept).not.toHaveBeenCalled();
+  });
+
+  it("says why the link was refused", async () => {
+    const onDone = vi.fn();
+    render(WelcomeForm, {
+      labels: WELCOME,
+      login: "ana",
+      accept: async () => Promise.reject(new Error("invitation_expired")),
+      errorMessage,
+      onDone,
+    });
+    await fireEvent.submit(screen.getByRole("button", { name: "Save the password" }).closest("form")!);
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("failed: invitation_expired");
     expect(onDone).not.toHaveBeenCalled();
   });
 });
