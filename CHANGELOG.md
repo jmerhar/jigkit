@@ -2,6 +2,8 @@
 
 All notable changes to jigkit are recorded here. The Python and npm packages share one version.
 
+## Unreleased
+
 ## 0.13.0 — 2026-11-08
 
 ### Added
