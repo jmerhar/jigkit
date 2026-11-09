@@ -6,7 +6,8 @@
   import { errorMessage } from "../lib/errors";
   import { moment } from "../lib/format";
   import { LANGUAGE_NAMES, chooseLanguage } from "../lib/language";
-  import { chooseTheme, chosenTheme, type Theme } from "../lib/theme";
+  import { preferences } from "../lib/preferences.svelte";
+  import { chooseTheme } from "../lib/theme";
   import { m } from "../paraglide/messages.js";
   import { locales, type Locale } from "../paraglide/runtime.js";
 
@@ -22,7 +23,6 @@
   let name = $state(me.name);
   // svelte-ignore state_referenced_locally
   let language = $state<string>(me.language ?? "");
-  let theme = $state<Theme>(chosenTheme());
   let current = $state("");
   let next = $state("");
   let passkeys = $state<Passkey[]>([]);
@@ -95,7 +95,7 @@
   </label>
   <label>
     {m.field_theme()}
-    <select bind:value={theme} onchange={() => chooseTheme(theme)}>
+    <select bind:value={preferences.theme} onchange={() => chooseTheme(preferences.theme)}>
       <option value="auto">{m.theme_auto()}</option>
       <option value="light">{m.theme_light()}</option>
       <option value="dark">{m.theme_dark()}</option>

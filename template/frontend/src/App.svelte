@@ -1,11 +1,23 @@
 <script lang="ts">
   import { LoginForm, PasskeyOffer, SetupForm } from "@jmerhar/jigkit/auth/svelte";
+  import { AppNav, type NavSwitch } from "@jmerhar/jigkit/nav/svelte";
   import { browserAuthenticator, type Authenticator } from "@jmerhar/jigkit/passkeys";
+  import CircleUser from "@lucide/svelte/icons/circle-user";
+  import Ellipsis from "@lucide/svelte/icons/ellipsis";
+  import Globe from "@lucide/svelte/icons/globe";
+  import LogOut from "@lucide/svelte/icons/log-out";
+  import Monitor from "@lucide/svelte/icons/monitor";
+  import Moon from "@lucide/svelte/icons/moon";
+  import StickyNote from "@lucide/svelte/icons/sticky-note";
+  import Sun from "@lucide/svelte/icons/sun";
+  import User from "@lucide/svelte/icons/user";
   import { onMount } from "svelte";
   import { Api, ApiError, type Me } from "./lib/api";
   import { errorMessage } from "./lib/errors";
   import { chooseLanguage, chosenLanguage } from "./lib/language";
   import { memory } from "./lib/passkeys";
+  import { preferences } from "./lib/preferences.svelte";
+  import { chooseTheme, type Theme } from "./lib/theme";
   import { m } from "./paraglide/messages.js";
   import type { Locale } from "./paraglide/runtime.js";
   import Account from "./pages/Account.svelte";
@@ -19,14 +31,9 @@
 
   /** What the app is showing. */
   let stage = $state<"loading" | "setup" | "login" | "ready" | "error">("loading");
-  let page = $state<"notes" | "account">("notes");
-  /** Whether the navigation is unfolded, on a screen too narrow to show it all. */
-  let menuOpen = $state(false);
-
-  function show(next: "notes" | "account"): void {
-    page = next;
-    menuOpen = false;
-  }
+  /** The page shown, from the address: #/account, or the notes. */
+  const pageOf = (hash: string) => (hash === "#/account" ? "account" : "notes");
+  let page = $state<"notes" | "account">(pageOf(location.hash));
   let me = $state<Me | null>(null);
   let problem = $state("");
   let offerPasskey = $state(false);
@@ -60,10 +67,40 @@
   }
 
   function loggedIn(): void {
-    if (!followAccountLanguage()) {
-      page = "notes";
-      stage = "ready";
-    }
+    if (!followAccountLanguage()) stage = "ready";
+  }
+
+  const switches = $derived<NavSwitch[]>([
+    {
+      label: m.field_theme(),
+      value: preferences.theme,
+      options: [
+        { value: "auto", label: m.theme_auto(), icon: Monitor },
+        { value: "light", label: m.theme_light(), icon: Sun },
+        { value: "dark", label: m.theme_dark(), icon: Moon },
+      ],
+      onchange: (value) => {
+        preferences.theme = value as Theme;
+        chooseTheme(preferences.theme);
+      },
+    },
+    {
+      label: m.field_language(),
+      value: me?.language ?? "",
+      options: [
+        { value: "", label: m.language_browser(), icon: Globe },
+        { value: "en", label: "EN" },
+        { value: "pt-PT", label: "PT" },
+      ],
+      onchange: (value) => void setLanguage(value),
+    },
+  ]);
+
+  /** Keep a language chosen from the account's menu on the account, then show the page in it. */
+  async function setLanguage(value: string): Promise<void> {
+    if (!me || (me.language ?? "") === value) return;
+    me = await api.updateAccount({ name: me.name, language: value || null });
+    chooseLanguage((me.language as Locale | null) ?? null, reload);
   }
 
   async function logOut(): Promise<void> {
@@ -73,7 +110,12 @@
     stage = "login";
   }
 
-  onMount(start);
+  onMount(() => {
+    const follow = () => (page = pageOf(location.hash));
+    addEventListener("hashchange", follow);
+    void start();
+    return () => removeEventListener("hashchange", follow);
+  });
 </script>
 
 {#if stage === "loading"}
@@ -128,26 +170,19 @@
     }}
   />
 {:else if me}
-  <header class="site-header" data-open={menuOpen || undefined}>
-    <strong class="brand">{m.app_name()}</strong>
-    <button
-      type="button"
-      class="secondary small menu-toggle"
-      aria-expanded={menuOpen}
-      onclick={() => (menuOpen = !menuOpen)}
-    >
-      {m.nav_menu()}
-    </button>
-    <nav class="site-nav">
-      <button type="button" class="link" aria-current={page === "notes"} onclick={() => show("notes")}>
-        {m.nav_notes()}
-      </button>
-      <button type="button" class="link" aria-current={page === "account"} onclick={() => show("account")}>
-        {m.nav_account()}
-      </button>
-      <button type="button" class="link" onclick={logOut}>{m.log_out()}</button>
-    </nav>
-  </header>
+  <AppNav
+    brand={m.app_name()}
+    home="#/"
+    pages={[{ label: m.nav_notes(), href: "#/", icon: StickyNote, current: page === "notes" }]}
+    account={{
+      name: me.name,
+      icon: CircleUser,
+      items: [{ label: m.nav_account(), href: "#/account", icon: User, current: page === "account" }],
+      switches,
+      logOut: { label: m.log_out(), icon: LogOut, onclick: () => void logOut() },
+    }}
+    labels={{ nav: m.nav_main(), more: m.nav_more(), moreIcon: Ellipsis }}
+  />
   <main>
     <PasskeyOffer
       bind:open={offerPasskey}

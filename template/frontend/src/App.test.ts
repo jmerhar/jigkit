@@ -4,7 +4,13 @@ import App from "./App.svelte";
 import { LANGUAGE_KEY } from "./lib/language";
 import { ME, fakeApi, fakeAuthenticator, refuse } from "./testing";
 
-afterEach(() => localStorage.clear());
+afterEach(() => {
+  localStorage.clear();
+  location.hash = "";
+});
+
+/** Open the navigation's menu whose button starts with `name`. */
+const openMenu = async (name: string) => fireEvent.click(await screen.findByRole("button", { name: new RegExp(`^${name}`) }));
 
 async function fill(label: string | RegExp, value: string): Promise<void> {
   await fireEvent.input(screen.getByLabelText(label), { target: { value } });
@@ -45,6 +51,7 @@ describe("starting", () => {
     await fireEvent.submit(screen.getByRole("button", { name: "Log in" }).closest("form")!);
     expect(await screen.findByRole("heading", { name: "Notes" })).toBeInTheDocument();
 
+    await openMenu("Ana");
     await fireEvent.click(screen.getByRole("button", { name: "Log out" }));
     expect(await screen.findByRole("heading", { name: "Log in" })).toBeInTheDocument();
   });
@@ -71,16 +78,36 @@ describe("starting", () => {
     render(App, { api, authenticator: fakeAuthenticator() });
 
     await screen.findByRole("heading", { name: "Notes" });
-    const menu = screen.getByRole("button", { name: "Menu" });
-    expect(menu).toHaveAttribute("aria-expanded", "false");
-    await fireEvent.click(menu);
-    expect(menu).toHaveAttribute("aria-expanded", "true");
-    expect(menu.closest("header")).toHaveAttribute("data-open");
-    await fireEvent.click(screen.getByRole("button", { name: "Account" }));
+    expect(screen.getByRole("link", { name: "Notes" })).toHaveAttribute("aria-current", "page");
+    await openMenu("Ana");
+    await fireEvent.click(screen.getByRole("link", { name: "Account" }));
     expect(await screen.findByRole("heading", { name: "Account" })).toBeInTheDocument();
-    expect(menu).toHaveAttribute("aria-expanded", "false");
-    await fireEvent.click(screen.getByRole("button", { name: "Notes" }));
+    expect(screen.getByRole("button", { name: /^Ana/ })).toHaveClass("current");
+    await fireEvent.click(screen.getByRole("link", { name: "Notes" }));
     expect(await screen.findByRole("heading", { name: "Notes" })).toBeInTheDocument();
+  });
+
+  it("switches the theme and the language from the account's menu", async () => {
+    const reload = vi.fn();
+    const { api, calls } = fakeApi({
+      "GET /setup": { required: false },
+      "GET /auth/me": ME,
+      "GET /notes": [],
+      "PUT /account": { ...ME, language: "pt-PT" },
+    });
+    render(App, { api, authenticator: fakeAuthenticator(), reload });
+    await openMenu("Ana");
+
+    await fireEvent.click(screen.getByRole("button", { name: "Dark" }));
+    expect(document.documentElement.dataset.theme).toBe("dark");
+    await fireEvent.click(screen.getByRole("button", { name: "As the device" }));
+    expect(document.documentElement.dataset.theme).toBeUndefined();
+
+    await fireEvent.click(screen.getByRole("button", { name: "As the browser" }));
+    expect(calls.some((call) => call.method === "PUT")).toBe(false);
+    await fireEvent.click(screen.getByRole("button", { name: "PT" }));
+    await waitFor(() => expect(reload).toHaveBeenCalledOnce());
+    expect(calls.find((call) => call.method === "PUT")!.body).toEqual({ name: "Ana", language: "pt-PT" });
   });
 
   it("follows the language saved on the account", async () => {
@@ -135,6 +162,7 @@ describe("starting", () => {
       "POST /auth/logout": refuse(500, "boom"),
     });
     render(App, { api, authenticator: fakeAuthenticator() });
+    await openMenu("Ana");
     await fireEvent.click(await screen.findByRole("button", { name: "Log out" }));
     expect(await screen.findByRole("heading", { name: "Log in" })).toBeInTheDocument();
   });

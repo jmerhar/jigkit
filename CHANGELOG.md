@@ -4,6 +4,11 @@ All notable changes to jigkit are recorded here. The Python and npm packages sha
 
 ## Unreleased
 
+### Changed
+
+- The template's header is `AppNav`, with `@lucide/svelte` icons and the theme and language
+  in the account's menu; its two pages are links (`#/`, `#/account`).
+
 ## 0.16.0 — 2026-11-09
 
 ### Added
