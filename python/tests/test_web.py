@@ -8,7 +8,7 @@ from typing import Any
 
 import httpx
 import pytest
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import PlainTextResponse
 
 import jigkit.web.server as serve_module
@@ -378,9 +378,43 @@ class TestManifest:
         assert manifest["lang"] == "en"
         assert manifest["icons"][0]["src"] == "/static/192.png"
 
-    def test_the_route_needs_a_language(self) -> None:
+    def test_the_route_needs_a_language_and_a_display(self) -> None:
         with pytest.raises(ValueError, match="at least one language"):
             manifest_router({}, background_color="#fff", theme_color="#000")
+        with pytest.raises(ValueError, match="at least one way"):
+            manifest_router(self.WORDS, background_color="#fff", theme_color="#000", displays=())
+
+    async def test_a_page_can_ask_for_another_display_the_app_offers(self) -> None:
+        app = FastAPI()
+        app.include_router(
+            manifest_router(
+                self.WORDS,
+                background_color="#fff",
+                theme_color="#000",
+                displays=("standalone", "fullscreen"),
+            )
+        )
+
+        async with await client_for(app) as client:
+            plain = await client.get("/manifest.webmanifest")
+            full = await client.get("/manifest.webmanifest", params={"display": "fullscreen"})
+            other = await client.get("/manifest.webmanifest", params={"display": "minimal-ui"})
+
+        assert plain.json()["display"] == "standalone"
+        assert full.json()["display"] == "fullscreen"
+        assert (other.status_code, other.json()["detail"]) == (422, "unknown_display")
+
+    async def test_the_name_can_say_there_is_nothing_to_install(self) -> None:
+        async def name(request: Request) -> str | None:
+            raise HTTPException(404)
+
+        app = FastAPI()
+        app.include_router(
+            manifest_router(self.WORDS, background_color="#fff", theme_color="#000", name=name)
+        )
+
+        async with await client_for(app) as client:
+            assert (await client.get("/manifest.webmanifest")).status_code == 404
 
 
 class TestServe:

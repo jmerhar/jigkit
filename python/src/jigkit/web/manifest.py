@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from collections.abc import Awaitable, Callable, Iterable, Mapping
+from collections.abc import Awaitable, Callable, Iterable, Mapping, Sequence
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import JSONResponse
 
 #: The PNG icons a manifest lists, by size; the largest is also offered as maskable.
@@ -37,10 +37,12 @@ def web_manifest(
     theme_color: str,
     short_name: str | None = None,
     icon: str = "/icons/icon-{size}.png",
+    display: str = "standalone",
 ) -> dict[str, object]:
     """A manifest for an application served from the root of its origin.
 
-    ``icon`` is a path pattern with ``{size}``. The largest icon is offered as maskable too: an
+    ``icon`` is a path pattern with ``{size}``; ``display`` is how the app opens, such as
+    ``standalone`` or ``fullscreen``. The largest icon is offered as maskable too: an
     icon drawn to keep to its centre survives a launcher's crop whole.
     """
     icons: list[Mapping[str, str]] = [
@@ -63,7 +65,7 @@ def web_manifest(
         "lang": lang,
         "start_url": "/",
         "scope": "/",
-        "display": "standalone",
+        "display": display,
         "background_color": background_color,
         "theme_color": theme_color,
         "icons": icons,
@@ -96,6 +98,7 @@ def manifest_router(
     default: str | None = None,
     name: Callable[[Request], Awaitable[str | None]] | None = None,
     icon: str = "/icons/icon-{size}.png",
+    displays: Sequence[str] = ("standalone",),
 ) -> APIRouter:
     """A router with ``GET /manifest.webmanifest``, which needs no login, for an application
     served from the root of its origin.
@@ -104,17 +107,25 @@ def manifest_router(
     the manifest is in the one the browser's Accept-Language prefers, else ``default`` (the
     first in ``words`` when not given). ``name``, when given, returns a name the application has
     been given, such as one an admin chose; None or a blank name keeps the one in ``words``.
-    The icons are the PNGs ``icon`` names (see :func:`web_manifest`).
+    It may also answer 404 by raising :class:`fastapi.HTTPException`, for an application with
+    nothing to install yet. The icons are the PNGs ``icon`` names (see :func:`web_manifest`).
+
+    The app opens as the first of ``displays``; a page that offers more links the manifest with
+    ``?display=`` naming another of them, and any other value is refused with a 422.
     """
     if not words:
         raise ValueError("words names the application in at least one language")
+    if not displays:
+        raise ValueError("displays names at least one way for the app to open")
     fallback = default or next(iter(words))
     router = APIRouter()
 
     @router.get("/manifest.webmanifest", include_in_schema=False)
-    async def get_manifest(request: Request) -> JSONResponse:
+    async def get_manifest(request: Request, display: str | None = None) -> JSONResponse:
         """The manifest, in the browser's language, since the browser fetches it itself and
         sends no session or account language with it."""
+        if display is not None and display not in displays:
+            raise HTTPException(422, "unknown_display")
         lang = preferred_language(request.headers.get("accept-language"), words, fallback)
         title, description = words[lang]
         chosen = (await name(request) if name else None) or ""
@@ -126,6 +137,7 @@ def manifest_router(
                 background_color=background_color,
                 theme_color=theme_color,
                 icon=icon,
+                display=display or displays[0],
             )
         )
 

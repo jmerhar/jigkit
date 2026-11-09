@@ -8,6 +8,8 @@ All notable changes to jigkit are recorded here. The Python and npm packages sha
 
 - The template serves its manifest with `manifest_router`, so a rendered application can be
   added to a phone's home screen.
+- `manifest_router(displays=...)`: an app can offer more than one way to open, such as
+  `fullscreen`, which a page asks for with `?display=`; `web_manifest(display=...)` likewise.
 
 ## 0.14.0 — 2026-11-09
 
