@@ -19,6 +19,7 @@ from jigkit.web import (
     install_security_headers,
     install_write_guard,
     manifest_response,
+    manifest_router,
     mount_spa,
     origin_allowed,
     preferred_language,
@@ -327,6 +328,59 @@ class TestManifest:
     )
     def test_preferred_language(self, header: str | None, expected: str) -> None:
         assert preferred_language(header, ["en", "pt-PT"], "en") == expected
+
+    WORDS = {"en": ("My app", "Does things"), "pt-PT": ("A minha app", "Faz coisas")}
+
+    async def test_the_route_answers_in_the_browsers_language_without_a_login(self) -> None:
+        app = FastAPI()
+        app.include_router(manifest_router(self.WORDS, background_color="#fff", theme_color="#000"))
+
+        async with await client_for(app) as client:
+            portuguese = await client.get(
+                "/manifest.webmanifest", headers={"Accept-Language": "pt"}
+            )
+            other = await client.get("/manifest.webmanifest", headers={"Accept-Language": "de"})
+
+        assert portuguese.status_code == 200
+        assert portuguese.headers["content-type"] == "application/manifest+json"
+        assert portuguese.json()["name"] == "A minha app"
+        assert portuguese.json()["description"] == "Faz coisas"
+        assert other.json()["lang"] == "en"
+        assert other.json()["theme_color"] == "#000"
+        assert "/manifest.webmanifest" not in app.openapi()["paths"]
+
+    @pytest.mark.parametrize(
+        ("chosen", "expected"),
+        [("  Main Street 1 ", "Main Street 1"), (" ", "Mine"), (None, "Mine")],
+    )
+    async def test_a_chosen_name_replaces_the_words_unless_blank(
+        self, chosen: str | None, expected: str
+    ) -> None:
+        async def name(request: Request) -> str | None:
+            return chosen
+
+        app = FastAPI()
+        app.include_router(
+            manifest_router(
+                {"nl": ("Mine", "d"), "en": ("Mine", "d")},
+                background_color="#fff",
+                theme_color="#000",
+                default="en",
+                name=name,
+                icon="/static/{size}.png",
+            )
+        )
+
+        async with await client_for(app) as client:
+            manifest = (await client.get("/manifest.webmanifest")).json()
+
+        assert manifest["name"] == manifest["short_name"] == expected
+        assert manifest["lang"] == "en"
+        assert manifest["icons"][0]["src"] == "/static/192.png"
+
+    def test_the_route_needs_a_language(self) -> None:
+        with pytest.raises(ValueError, match="at least one language"):
+            manifest_router({}, background_color="#fff", theme_color="#000")
 
 
 class TestServe:

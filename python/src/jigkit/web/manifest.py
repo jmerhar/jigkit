@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable, Mapping
+from collections.abc import Awaitable, Callable, Iterable, Mapping
 
+from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 
 #: The PNG icons a manifest lists, by size; the largest is also offered as maskable.
@@ -85,3 +86,47 @@ def manifest_response(manifest: Mapping[str, object]) -> JSONResponse:
             "Vary": "Accept-Language",
         },
     )
+
+
+def manifest_router(
+    words: Mapping[str, tuple[str, str]],
+    *,
+    background_color: str,
+    theme_color: str,
+    default: str | None = None,
+    name: Callable[[Request], Awaitable[str | None]] | None = None,
+    icon: str = "/icons/icon-{size}.png",
+) -> APIRouter:
+    """A router with ``GET /manifest.webmanifest``, which needs no login, for an application
+    served from the root of its origin.
+
+    ``words`` gives the application's name and description in each language its interface has;
+    the manifest is in the one the browser's Accept-Language prefers, else ``default`` (the
+    first in ``words`` when not given). ``name``, when given, returns a name the application has
+    been given, such as one an admin chose; None or a blank name keeps the one in ``words``.
+    The icons are the PNGs ``icon`` names (see :func:`web_manifest`).
+    """
+    if not words:
+        raise ValueError("words names the application in at least one language")
+    fallback = default or next(iter(words))
+    router = APIRouter()
+
+    @router.get("/manifest.webmanifest", include_in_schema=False)
+    async def get_manifest(request: Request) -> JSONResponse:
+        """The manifest, in the browser's language, since the browser fetches it itself and
+        sends no session or account language with it."""
+        lang = preferred_language(request.headers.get("accept-language"), words, fallback)
+        title, description = words[lang]
+        chosen = (await name(request) if name else None) or ""
+        return manifest_response(
+            web_manifest(
+                name=chosen.strip() or title,
+                description=description,
+                lang=lang,
+                background_color=background_color,
+                theme_color=theme_color,
+                icon=icon,
+            )
+        )
+
+    return router

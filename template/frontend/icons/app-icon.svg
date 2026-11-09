@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- The favicon's page on an opaque square: home screens fill a transparent icon with a colour
+       of their own. The drawing stays within the central circle Android keeps when it crops an
+       icon to its own shape (radius 40% of the side). `make app-icons` renders the PNGs. -->
+  <rect width="512" height="512" fill="#2f6f5e"/>
+  <path d="M188 150h100l52 52v160H188z" fill="#ffffff"/>
+  <path d="M288 150v52h52" fill="#cfe5dd"/>
+</svg>

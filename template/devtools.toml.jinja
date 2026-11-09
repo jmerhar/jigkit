@@ -16,8 +16,15 @@ files = [
   "bin/export-openapi.py",
   "bin/dev.sh",
   "bin/ci.py",
+  "bin/app-icons.sh",
 ]
 coverage = true
+
+# The home-screen icons, rendered from the drawing (`make app-icons`).
+[icons]
+svg = "frontend/icons/app-icon.svg"
+out = "frontend/public/icons"
+background = "#2f6f5e"
 
 # Every check `make lint` runs.
 [lint]

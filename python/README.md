@@ -21,7 +21,7 @@ pip install "jigkit[db]"
 | `jigkit.spool`, `jigkit.delivery` | — | a bounded on-disk queue per destination, and write-now-or-spool-and-replay |
 | `jigkit.influx` | `influx` | InfluxDB 3 and 2.x sinks: line protocol in each batch's precision, and SQL reads from InfluxDB 3 |
 | `jigkit.heartbeat` | `heartbeat` | a push-monitor heartbeat after delivered writes, at most once per interval |
-| `jigkit.web` | `web` | FastAPI building blocks: a fail-closed access policy, write guard, security headers, SPA serving, health router, PWA manifest, `serve()` |
+| `jigkit.web` | `web` | FastAPI building blocks: a fail-closed access policy, write guard, security headers, SPA serving, health router, PWA manifest and its route, `serve()` |
 | `jigkit.scheduler` | — | `TickLoop`: in-process work on a fixed tick |
 | `jigkit.notify` | `notify` | Apprise delivery off the event loop, and URL redaction for logs |
 | `jigkit.ratelimit` | — | `RateLimiter`: a token bucket per client with bounded memory |

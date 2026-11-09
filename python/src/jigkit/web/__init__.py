@@ -8,7 +8,8 @@ factory and lifespan and takes only the pieces it wants:
 - :func:`install_security_headers`: nosniff, a same-origin referrer, no framing;
 - :func:`mount_spa`: the built single-page app, with its client-side routes and cache headers;
 - :func:`health_router`: ``/health``, which queries the database;
-- :func:`web_manifest` and :func:`manifest_response`: the PWA manifest;
+- :func:`manifest_router`: ``/manifest.webmanifest``, for adding the app to a home screen, built
+  from :func:`web_manifest` and :func:`manifest_response`;
 - :func:`serve`: uvicorn, believing forwarded headers only from the configured proxies.
 """
 
@@ -21,7 +22,12 @@ from jigkit.web.guard import (
     origin_allowed,
 )
 from jigkit.web.health import Health, health_router
-from jigkit.web.manifest import manifest_response, preferred_language, web_manifest
+from jigkit.web.manifest import (
+    manifest_response,
+    manifest_router,
+    preferred_language,
+    web_manifest,
+)
 from jigkit.web.server import serve
 from jigkit.web.spa import IMMUTABLE, mount_spa
 
@@ -36,6 +42,7 @@ __all__ = [
     "install_security_headers",
     "install_write_guard",
     "manifest_response",
+    "manifest_router",
     "mount_spa",
     "origin_allowed",
     "preferred_language",

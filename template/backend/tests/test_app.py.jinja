@@ -17,6 +17,16 @@ async def test_the_health_check_queries_the_database(client: httpx.AsyncClient) 
     assert response.json()["database"] == "connected"
 
 
+async def test_the_manifest_adds_the_app_to_a_home_screen(new_client) -> None:
+    async with new_client() as browser:
+        response = await browser.get("/manifest.webmanifest", headers={"Accept-Language": "pt-PT"})
+
+    assert response.status_code == 200
+    assert response.json()["name"] == "{{ app_title }}"
+    assert response.json()["lang"] == "pt-PT"
+    assert response.json()["icons"][0]["src"] == "/icons/icon-192.png"
+
+
 async def test_a_write_without_the_header_is_refused(new_client, user) -> None:
     async with new_client(write_header=False) as browser:
         response = await browser.post("/api/notes", json={"title": "x"})

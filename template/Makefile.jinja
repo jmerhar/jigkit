@@ -74,6 +74,9 @@ revision: ## Create a migration from the models: make revision M="add a column"
 
 ##@ Releasing
 
+app-icons: ## Render the home-screen icons from frontend/icons/app-icon.svg (needs rsvg-convert)
+	.devtools/bin/app-icons.sh
+
 lockfile: ## Regenerate package-lock.json (Linux binaries, public registry URLs)
 	.devtools/bin/lockfile.sh
 
