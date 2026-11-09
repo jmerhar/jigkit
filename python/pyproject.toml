@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "jigkit"
-version = "0.17.0.dev0"
+version = "0.17.0"
 description = "The shared foundations of small self-hosted web apps: settings, database, migrations, logging, health checks and test fixtures"
 readme = "README.md"
 requires-python = ">=3.14"
