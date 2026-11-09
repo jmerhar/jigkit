@@ -4,6 +4,11 @@ All notable changes to jigkit are recorded here. The Python and npm packages sha
 
 ## Unreleased
 
+### Added
+
+- The template serves its manifest with `manifest_router`, so a rendered application can be
+  added to a phone's home screen.
+
 ## 0.14.0 — 2026-11-09
 
 ### Added
