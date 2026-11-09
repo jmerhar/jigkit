@@ -10,9 +10,9 @@
  *
  * The class names are the ones jigkit's Svelte components carry (card, narrow, actions,
  * secondary, link, muted, or, other-login, wide-button, note, offer, list, what) and a few
- * general ones: site-header, site-nav, nav-gap, nav-menu, nav-menu-items, menu-toggle, tabs,
- * kpis, kpi, alert, tag, chips, chip, grid tables, num, pos, neg, nowrap, field-row,
- * table-scroll, hide-narrow, sr-only.
+ * general ones: app-* (AppNav's), icon, site-header, site-nav, nav-gap, nav-menu,
+ * nav-menu-items, menu-toggle, tabs, kpis, kpi, alert, tag, chips, chip, grid tables, num, pos,
+ * neg, nowrap, field-row, table-scroll, hide-narrow, sr-only.
  */
 
 :root {
@@ -329,6 +329,323 @@ small {
   }
 }
 
+/*
+ * The application's navigation (AppNav, from @jmerhar/jigkit/nav/svelte): one bar across the top
+ * while it fits on one line; once it does not (data-compact, which AppNav sets) the pages become
+ * a tab bar along the bottom, with a "More" tab that opens upwards. The account's menu stays in
+ * the top bar.
+ */
+
+.app-bar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  padding: max(0.5rem, env(safe-area-inset-top)) 1rem 0.5rem;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.app-bar-inner {
+  display: flex;
+  gap: 0.5rem 1.25rem;
+  align-items: center;
+  max-width: calc(var(--page-width) - 2rem);
+  margin: 0 auto;
+}
+
+/* The name gives way first: onto a second line, then cut short. */
+.app-bar .brand {
+  display: -webkit-box;
+  flex: 0 1 auto;
+  min-width: 6rem;
+  overflow: hidden;
+  color: inherit;
+  font-weight: 700;
+  line-height: 1.25;
+  text-decoration: none;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.app-pages {
+  display: flex;
+  flex: none;
+  gap: 0.25rem 1rem;
+  align-items: center;
+}
+
+.app-pages > a,
+.app-menu-button {
+  display: inline-flex;
+  gap: 0.35rem;
+  align-items: center;
+  padding: 0.35rem 0;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.app-pages > a:hover,
+.app-menu-button:hover {
+  color: var(--text);
+}
+
+.app-pages > a[aria-current="page"],
+.app-menu-button.current {
+  border-bottom-color: var(--accent);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.app-bar svg {
+  flex: none;
+  width: 1.15em;
+  height: 1.15em;
+}
+
+/* A menu whose entries carry a count or mark, so it shows before the menu is opened. */
+.app-menu-button.marked::after {
+  content: "";
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: var(--warning);
+}
+
+.app-badge {
+  min-width: 1.25rem;
+  padding: 0 0.35rem;
+  border-radius: 0.625rem;
+  background: var(--warning-bg);
+  color: var(--warning);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.25rem;
+  text-align: center;
+}
+
+.app-chevron {
+  width: 0.35rem;
+  height: 0.35rem;
+  margin: -0.2rem 0.1rem 0;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg);
+}
+
+[aria-expanded="true"] > .app-chevron {
+  margin-top: 0.15rem;
+  transform: rotate(-135deg);
+}
+
+.app-menu {
+  position: relative;
+}
+
+.app-more {
+  display: none;
+}
+
+.app-tools {
+  flex: 0 1 auto;
+  min-width: 0;
+  margin-left: auto;
+}
+
+.app-account {
+  flex: none;
+  margin-left: auto;
+}
+
+.app-tools + .app-account {
+  margin-left: 0;
+}
+
+.app-name {
+  overflow: hidden;
+  max-width: 12rem;
+  text-overflow: ellipsis;
+}
+
+.app-menu-panel {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  left: 0;
+  z-index: 30;
+  min-width: 13rem;
+  margin: 0;
+  padding: 0.35rem;
+  border: 1px solid var(--line);
+  border-radius: var(--control-radius);
+  background: var(--surface);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.18);
+  list-style: none;
+}
+
+.app-menu-panel.end {
+  right: 0;
+  left: auto;
+}
+
+.app-menu-panel a,
+.app-menu-panel button {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  width: 100%;
+  min-height: 2.5rem;
+  padding: 0.45rem 0.7rem;
+  border: none;
+  border-radius: calc(var(--control-radius) - 0.125rem);
+  background: none;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.app-menu-panel a:hover,
+.app-menu-panel button:hover {
+  background: var(--accent-soft);
+}
+
+.app-menu-panel a[aria-current="page"] {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.app-menu-panel .app-badge {
+  margin-left: auto;
+}
+
+.app-menu-heading {
+  padding: 0.6rem 0.7rem 0.2rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* A choice such as the theme: a row of buttons, the chosen one pressed. */
+.app-switch {
+  display: flex;
+  margin: 0.25rem 0.35rem;
+  border: 1px solid var(--line);
+  border-radius: var(--control-radius);
+  overflow: hidden;
+}
+
+.app-menu-panel .app-switch button {
+  flex: 1;
+  justify-content: center;
+  min-height: 2.25rem;
+  padding: 0.35rem;
+  border-radius: 0;
+  color: var(--muted);
+}
+
+.app-menu-panel .app-switch button + button {
+  border-left: 1px solid var(--line);
+}
+
+.app-menu-panel .app-switch button[aria-pressed="true"] {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.app-bar[data-compact] .app-pages {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 20;
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  gap: 0;
+  padding: 0.25rem 0.25rem calc(0.25rem + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.app-bar[data-compact] .app-pages > a,
+.app-bar[data-compact] .app-pages .app-menu-button {
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.15rem;
+  width: 100%;
+  min-width: 0;
+  padding: 0.3rem 0.1rem;
+  border-bottom: none;
+  font-size: 0.72rem;
+}
+
+.app-bar[data-compact] .app-pages > a > span:not(.app-badge),
+.app-bar[data-compact] .app-pages .app-menu-button > span {
+  overflow: hidden;
+  max-width: 100%;
+  text-overflow: ellipsis;
+}
+
+.app-bar[data-compact] .app-pages svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.app-bar[data-compact] .app-pages > a[aria-current="page"],
+.app-bar[data-compact] .app-pages .app-menu-button.current {
+  color: var(--accent);
+}
+
+.app-bar[data-compact] .app-pages .app-badge {
+  position: absolute;
+  margin: -1.6rem 0 0 1.6rem;
+}
+
+.app-bar[data-compact] .app-pages > a {
+  position: relative;
+}
+
+.app-bar[data-compact] .app-wide-only {
+  display: none !important;
+}
+
+.app-bar[data-compact] .app-more {
+  display: block;
+}
+
+.app-bar[data-compact] .app-pages .app-menu {
+  position: static;
+}
+
+/* Above the More tab, at the right edge, as wide as its entries. */
+.app-bar[data-compact] .app-pages .app-menu-panel {
+  top: auto;
+  right: 0.5rem;
+  bottom: calc(100% + 0.4rem);
+  left: auto;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.app-bar[data-compact] .app-name {
+  max-width: 9rem;
+}
+
+/* Room at the foot of the page for the tab bar. */
+body:has(.app-bar[data-compact]) main {
+  padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+}
+
 /* Tabs: sections of one page, each a link, the shown one marked aria-current="page". */
 .tabs {
   display: flex;
@@ -339,6 +656,9 @@ small {
 }
 
 .tabs a {
+  display: inline-flex;
+  gap: 0.4rem;
+  align-items: center;
   margin-bottom: -1px;
   padding: 0.5rem 0.875rem;
   border-bottom: 2px solid transparent;
@@ -523,6 +843,40 @@ button.link[aria-current="true"] {
   flex-wrap: wrap;
   gap: 0.5rem;
   align-items: center;
+}
+
+/*
+ * Icons, such as @lucide/svelte's (class "lucide") or any svg with class "icon": the size of the
+ * text beside them, in its colour, and beside a button's or a heading's words with a small gap.
+ */
+svg.lucide,
+svg.icon {
+  flex: none;
+  width: 1.15em;
+  height: 1.15em;
+  vertical-align: -0.2em;
+}
+
+button:has(> svg),
+.kpi-label:has(> svg),
+h2:has(> svg) {
+  display: inline-flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+button:has(> svg) {
+  white-space: nowrap;
+}
+
+.alert:has(> svg:first-child) {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+}
+
+.alert > svg:first-child {
+  margin-top: 0.15rem;
 }
 
 /* Cards. */

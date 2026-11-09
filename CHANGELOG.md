@@ -4,6 +4,15 @@ All notable changes to jigkit are recorded here. The Python and npm packages sha
 
 ## Unreleased
 
+### Added
+
+- `AppNav` in `@jmerhar/jigkit/nav/svelte`: an application's navigation, with its pages, a
+  drop-down per menu and the account's menu with switches such as the theme and the language.
+  On a wide screen it is one bar across the top; on a phone the pages become a tab bar along
+  the bottom, and a "More" tab lists the rest. Entries can carry an icon and a count.
+- base.css styles `AppNav` (`app-*`) and sizes icons (`svg.lucide`, `svg.icon`) to the text
+  beside them, in buttons, headings, figure labels and alerts.
+
 ## 0.15.0 — 2026-11-09
 
 ### Added

@@ -50,7 +50,7 @@ python/src/jigkit/
 python/tests/
   sample_app/      a small application with its own Alembic project, for the migration tests
 js/src/            the npm package: storage.ts, theme.ts, i18n/ (index, build, testing), api.ts,
-                   format.ts, passkeys.ts, auth/svelte/ (Svelte components), styles/base.css;
+                   format.ts, passkeys.ts, auth/svelte/ and nav/svelte/ (Svelte components), styles/base.css;
                    one subpath export each, built by svelte-package
 js/tests/          Vitest, in jsdom
 copier.yml         the template's questions; template/ is what it renders

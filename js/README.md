@@ -9,7 +9,7 @@ npm install --save-exact @jmerhar/jigkit
 ```
 
 Each module is its own entry point and imports nothing it does not use; all but
-`auth/svelte` are framework-free:
+`auth/svelte` and `nav/svelte` are framework-free:
 
 | Import | What it gives an interface |
 |---|---|
@@ -22,6 +22,7 @@ Each module is its own entry point and imports nothing it does not use; all but
 | `@jmerhar/jigkit/format` | euros and amounts typed either way (`parseAmount`), basis points as percentages, days, moments, calendar dates in a time zone, file sizes; the locale is always a parameter |
 | `@jmerhar/jigkit/passkeys` | `browserAuthenticator` over `@simplewebauthn/browser` (an optional peer dependency), `dismissed`, `deviceName`, `passkeyMemory` |
 | `@jmerhar/jigkit/auth/svelte` | `LoginForm` (password, passkey button and autofill), `SetupForm`, `WelcomeForm` (a password chosen from an invitation or reset link), `PasskeyOffer`, `PasskeyList`: Svelte 5 components (an optional peer dependency) taking the app's words and API calls as props, styled by the app's own stylesheet |
+| `@jmerhar/jigkit/nav/svelte` | `AppNav`: the brand, pages, drop-down menus and the account's menu (with switches such as the theme and language), as a top bar on a wide screen and a bottom tab bar with "More" on a phone; icons are components the app passes in, such as `@lucide/svelte`'s |
 | `@jmerhar/jigkit/styles/base.css` | the shared stylesheet, imported first by the app's own: colour tokens for light and dark, form controls, buttons, cards, tables, alerts, tags, chips, tabs, figure tiles, and a header whose navigation has drop-down groups and folds behind a menu button |
 
 ```ts

@@ -46,6 +46,11 @@
       "types": "./dist/i18n/testing.d.ts",
       "default": "./dist/i18n/testing.js"
     },
+    "./nav/svelte": {
+      "types": "./dist/nav/svelte/index.d.ts",
+      "svelte": "./dist/nav/svelte/index.js",
+      "default": "./dist/nav/svelte/index.js"
+    },
     "./passkeys": {
       "types": "./dist/passkeys.d.ts",
       "default": "./dist/passkeys.js"
