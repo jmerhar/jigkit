@@ -5,13 +5,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from jigkit.notify import Sender
-from jigkit.web import (
-    health_router,
-    install_security_headers,
-    install_write_guard,
-    manifest_router,
-    mount_spa,
-)
+from jigkit.web import health_router, install_security_headers, install_write_guard, mount_spa
 from sqlalchemy import text
 
 from .. import __summary__, __version__
@@ -21,12 +15,6 @@ from .deps import build_services
 from .routers import account, auth, notes, passkeys, setup
 
 API_PREFIX = "/api"
-#: The app's name and description in each language the interface has, for its manifest.
-APP_NAME = "{{ app_title }}"
-WORDS = {"en": (APP_NAME, __summary__), "pt-PT": (APP_NAME, __summary__)}
-#: The splash screen behind the icon while the app opens, and the colour of the system bars.
-BACKGROUND = "#f7f6f2"
-THEME = "#2f6f5e"
 
 
 def create_app(settings: Settings | None = None, sender: Sender | None = None) -> FastAPI:
@@ -68,7 +56,6 @@ def create_app(settings: Settings | None = None, sender: Sender | None = None) -
         app, value=WRITE_HEADER_VALUE, public_url=settings.public_url, prefix=API_PREFIX
     )
     install_security_headers(app)
-    app.include_router(manifest_router(WORDS, background_color=BACKGROUND, theme_color=THEME))
     mount_spa(app, settings.static_dir, api_prefix=API_PREFIX)
     return app
 

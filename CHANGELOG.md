@@ -9,8 +9,8 @@ All notable changes to jigkit are recorded here. The Python and npm packages sha
 - `jigkit.web.manifest_router`: `GET /manifest.webmanifest` for adding an application to a
   home screen, in the language the browser prefers, with an optional name the application has
   been given.
-- The template is installable on a phone: the manifest route, a home-screen icon with its
-  rendered PNGs and `make app-icons`, and the manifest and touch-icon links in `index.html`.
+- The template's home-screen icon, with its rendered PNGs and `make app-icons`, and the
+  manifest and touch-icon links in `index.html`.
 
 ## 0.13.0 — 2026-11-08
 
