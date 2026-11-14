@@ -679,8 +679,10 @@ body:has(.app-bar[data-compact]) main {
 
 /* Forms. */
 
+/* Its rows keep to their content, so a field beside a taller one keeps its input's height. */
 label {
   display: grid;
+  align-content: start;
   gap: 0.25rem;
 }
 

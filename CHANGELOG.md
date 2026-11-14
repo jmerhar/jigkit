@@ -4,6 +4,10 @@ All notable changes to jigkit are recorded here. The Python and npm packages sha
 
 ## Unreleased
 
+### Fixed
+
+- A label's input keeps its height when the field sits in a row beside a taller one.
+
 ## 0.17.0 — 2026-11-09
 
 ### Changed

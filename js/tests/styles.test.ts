@@ -42,6 +42,10 @@ describe("the base stylesheet", () => {
     expect(select).toContain("background-position: right 0.8rem center");
   });
 
+  it("keeps a label's input at its own height beside a taller field", () => {
+    expect(rule("label")).toContain("align-content: start");
+  });
+
   it("draws a menu's chevron as a turned corner, pointing down until it opens", () => {
     const closed = rule(".nav-menu > summary::after");
     const open = rule(".nav-menu[open] > summary::after");
