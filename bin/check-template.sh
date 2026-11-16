@@ -12,11 +12,14 @@
 #   DIR      where the application is rendered (default: a temporary directory, removed after)
 #   COPIER   the copier command (default: copier)
 #   PORT     the host port the image is tried on (default: 18080)
+#   WAIT     seconds to wait for the jigkit release the template pins to be installable from
+#            PyPI and npm (default: 900)
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
 copier="${COPIER:-copier}"
 port="${PORT:-18080}"
+wait="${WAIT:-900}"
 slug="household-inventory-tracker"
 # Long enough to break any line of code it is written into.
 description="Every item in the household, where it is kept, what it cost and when its warranty ends"
@@ -46,6 +49,20 @@ rm -rf "$app"
   -d description="$description" "$root" "$app"
 cd "$app"
 git init --quiet
+
+# The application pins the newest release before this commit, which on a release commit and the
+# ones just after it may still be on its way to PyPI and npm: wait for both to serve it.
+pinned=$(grep -m1 -oE '"@jmerhar/jigkit": "[^"]+"' frontend/package.json | cut -d'"' -f4)
+echo "--- waiting for jigkit $pinned on PyPI and npm"
+deadline=$((SECONDS + wait))
+until curl -fsS https://pypi.org/simple/jigkit/ 2>/dev/null | grep -q "jigkit-${pinned}[.-]" &&
+  npm view "@jmerhar/jigkit@$pinned" version 2>/dev/null | grep -qx "$pinned"; do
+  if [ "$SECONDS" -ge "$deadline" ]; then
+    echo "template check: jigkit $pinned is not on PyPI and npm after ${wait}s" >&2
+    exit 1
+  fi
+  sleep 15
+done
 
 echo "--- lockfile, install and the API's types"
 make lockfile

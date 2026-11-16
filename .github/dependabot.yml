@@ -31,7 +31,8 @@ updates:
         patterns:
           - "*"
 
-  # The npm package's development dependencies and its peer ranges.
+  # The npm package's development dependencies and its peer ranges. TypeScript stays on 6 while
+  # svelte-check's peer range ends there.
   - package-ecosystem: "npm"
     directory: "/js"
     schedule:
@@ -40,6 +41,9 @@ updates:
       default-days: 3
       exclude:
         - "@jmerhar/*"
+    ignore:
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
     groups:
       js:
         patterns:
