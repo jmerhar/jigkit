@@ -32,6 +32,17 @@ export const NOT_AUTHENTICATED = "not_authenticated";
 /** 409's code: the application has no administrator yet, and first-run setup comes first. */
 export const SETUP_REQUIRED = "setup_required";
 
+/**
+ * FastAPI's validation errors as one reason: each one's `msg`, joined with "; ", or "invalid" when
+ * none has one. For the `invalid` option of an interface that shows the server's own sentences.
+ */
+export function fieldMessages(detail: unknown[]): string {
+  const messages = detail
+    .map((item) => (item && typeof item === "object" ? (item as { msg?: unknown }).msg : undefined))
+    .filter((msg): msg is string => typeof msg === "string" && msg !== "");
+  return messages.length > 0 ? messages.join("; ") : "invalid";
+}
+
 /** The header the API's write guard (`jigkit.web.install_write_guard`) wants on every write. */
 export function writeHeader(value: string): Record<string, string> {
   return { "X-Requested-With": value };
@@ -50,6 +61,11 @@ export interface ClientOptions {
   unreachable?: (error: unknown) => string;
   /** The message of the error for a failure the server gave no reason for. */
   failed?: (status: number, statusText: string) => string;
+  /**
+   * The reason for FastAPI's list of validation errors, "invalid" without it; {@link fieldMessages}
+   * gives each field's message.
+   */
+  invalid?: (detail: unknown[]) => string;
   /**
    * The application's own error for a refusal, such as one for {@link NOT_AUTHENTICATED} that
    * sends the interface to its login; undefined leaves it an {@link ApiError}.
@@ -118,15 +134,16 @@ export class ApiClient {
   }
 
   /**
-   * Why a request failed: the server's `detail` when it is a code or a sentence, "invalid" for
-   * FastAPI's list of validation errors, else the `failed` option's message or the status text.
+   * Why a request failed: the server's `detail` when it is a code or a sentence, the `invalid`
+   * option's reason (or "invalid") for FastAPI's list of validation errors, else the `failed`
+   * option's message or the status text.
    * A proxy's error page is not JSON, and falls through to the status.
    */
   private async reason(response: Response): Promise<string> {
     try {
       const body = (await response.json()) as { detail?: unknown };
       if (typeof body.detail === "string") return body.detail;
-      if (Array.isArray(body.detail)) return "invalid";
+      if (Array.isArray(body.detail)) return this.options.invalid?.(body.detail) ?? "invalid";
     } catch {
       // Not JSON.
     }

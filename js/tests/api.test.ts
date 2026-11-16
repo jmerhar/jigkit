@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { ApiClient, ApiError, NOT_AUTHENTICATED, SETUP_REQUIRED, writeHeader } from "../src/api";
+import { ApiClient, ApiError, fieldMessages, NOT_AUTHENTICATED, SETUP_REQUIRED, writeHeader } from "../src/api";
 
 /** A fetch that answers every request with `response`, and records what it was asked. */
 function answering(response: Response | Error) {
@@ -110,6 +110,20 @@ describe("failures", () => {
   it("calls a list of validation errors invalid", async () => {
     const error = await failure(new ApiClient({ fetcher: answering(json({ detail: [{ loc: ["x"] }] }, 422)) }));
     expect([error.status, error.message]).toEqual([422, "invalid"]);
+  });
+
+  it("words a list of validation errors as the application asks", async () => {
+    const detail = [{ loc: ["body", "url"], msg: "must be an http:// or https:// URL" }, { msg: "too long" }];
+    const error = await failure(
+      new ApiClient({ fetcher: answering(json({ detail }, 422)), invalid: fieldMessages }),
+    );
+    expect([error.status, error.message]).toEqual([422, "must be an http:// or https:// URL; too long"]);
+  });
+
+  it("joins the fields' messages, or says invalid when there are none", () => {
+    expect(fieldMessages([{ msg: "a" }, null, "text", { msg: "" }, { msg: 3 }, { msg: "b" }])).toBe("a; b");
+    expect(fieldMessages([{ loc: ["x"] }])).toBe("invalid");
+    expect(fieldMessages([])).toBe("invalid");
   });
 
   it("falls back to the status text, or the status, without a reason", async () => {

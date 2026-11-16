@@ -4,6 +4,11 @@ All notable changes to jigkit are recorded here. The Python and npm packages sha
 
 ## Unreleased
 
+### Added
+
+- `ClientOptions.invalid`: the reason for FastAPI's list of validation errors in place of
+  "invalid", and `fieldMessages`, which joins each error's message, for it.
+
 ### Changed
 
 - The template refuses a request without a login with `jigkit.refusals.NOT_AUTHENTICATED`.
