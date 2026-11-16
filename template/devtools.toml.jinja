@@ -17,6 +17,10 @@ files = [
   "bin/dev.sh",
   "bin/ci.py",
   "bin/app-icons.sh",
+  "bin/devtools-check.py",
+  "fetch/devtools-fetch.sh",
+  "make/npm.mk",
+  "bin/npm-ci.sh",
 ]
 coverage = true
 
@@ -28,7 +32,7 @@ background = "#2f6f5e"
 
 # Every check `make lint` runs.
 [lint]
-checks = ["shellcheck", "ruff", "lockfile", "version", "compose"]
+checks = ["shellcheck", "ruff", "lockfile", "version", "compose", "devtools"]
 ruff = "backend/.venv/bin/ruff"
 
 # Each combination of compose files that is run, validated by `make lint` and CI.
@@ -61,6 +65,27 @@ app = "{{ package }}.api.schema:build_app"
 schema = "frontend/openapi.json"
 types = "frontend/src/lib/api-types.ts"
 defaults_optional = false
+
+# .github/dependabot.yml, generated from these by `make devtools-fix`: GitHub Actions, then each
+# update below, every one grouped into a single weekly pull request that takes a release once it is
+# three days old. A pull request builds the image, so a dependency that breaks it fails there.
+[[dependabot.update]]
+ecosystem = "npm"
+directory = "/frontend"
+group = "frontend"
+comment = """The interface. svelte-check names the TypeScript majors it supports as a peer
+dependency, so a new major cannot install until svelte-check accepts it; move both by hand then."""
+ignore = [{ dependency = "typescript", update_types = ["version-update:semver-major"] }]
+
+[[dependabot.update]]
+ecosystem = "pip"
+directory = "/backend"
+group = "backend"
+comment = "The backend's declared ranges; only a release outside one opens a pull request."
+
+# codecov.yml, generated from coverage.toml and this by `make devtools-fix`.
+[codecov]
+paths = { backend = ["backend/"], frontend = ["frontend/src/"] }
 
 # CI, run by jmerhar/devtools' python-docker-app.yml (.github/workflows/ci.yml): each suite is a job,
 # the image is built once all of them and the coverage gate pass, and a version tag gets its

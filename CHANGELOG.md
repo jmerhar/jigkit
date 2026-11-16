@@ -7,6 +7,9 @@ All notable changes to jigkit are recorded here. The Python and npm packages sha
 ### Changed
 
 - The template refuses a request without a login with `jigkit.refusals.NOT_AUTHENTICATED`.
+- The template takes devtools' npm targets (`node-modules`, `lockfile`) and generates its
+  `.github/dependabot.yml` and `codecov.yml` from `devtools.toml`, which `make lint` keeps in
+  step.
 
 ## 0.20.0 — 2026-11-16
 
