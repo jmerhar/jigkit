@@ -2,6 +2,12 @@
 
 All notable changes to jigkit are recorded here. The Python and npm packages share one version.
 
+## Unreleased
+
+### Changed
+
+- The template refuses a request without a login with `jigkit.refusals.NOT_AUTHENTICATED`.
+
 ## 0.20.0 — 2026-11-16
 
 ### Added
