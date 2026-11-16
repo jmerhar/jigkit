@@ -10,7 +10,6 @@ from jigkit.auth import LoginThrottle
 from jigkit.auth.passkeys import Ceremonies
 from jigkit.db import create_engine, create_sessionmaker, session_scope
 from jigkit.notify import AppriseSender, Sender
-from jigkit.refusals import NOT_AUTHENTICATED
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
 from ..auth import SESSION_COOKIE, SESSIONS
@@ -68,7 +67,7 @@ async def get_session(request: Request, db: DbDep) -> Session:
     token = request.cookies.get(SESSION_COOKIE)
     session = await SESSIONS.find(db, token) if token else None
     if session is None:
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, NOT_AUTHENTICATED)
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "not_authenticated")
     return session
 
 
