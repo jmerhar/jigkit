@@ -4,6 +4,15 @@ All notable changes to jigkit are recorded here. The Python and npm packages sha
 
 ## Unreleased
 
+### Added
+
+- `jigkit.refusals`: `NOT_AUTHENTICATED` (401) and `SETUP_REQUIRED` (409), the `detail` codes
+  for a request without a login and one before first-run setup; `@jmerhar/jigkit/api` exports
+  the same two.
+- `ClientOptions.refused`: turns a refusal into the application's own error, such as one that
+  sends the interface to its login, instead of an `ApiError`.
+- `RecordingSender.titles`: the title of every message it recorded.
+
 ## 0.19.0 — 2026-11-16
 
 ### Added

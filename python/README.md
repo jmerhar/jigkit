@@ -25,6 +25,7 @@ pip install "jigkit[db]"
 | `jigkit.scheduler` | — | `Schedule`: jobs on their own intervals, with failures reported and wake-ups; `TickLoop`: one function on a fixed tick |
 | `jigkit.notify` | `notify` | Apprise delivery off the event loop, and URL redaction for logs |
 | `jigkit.ratelimit` | — | `RateLimiter`: a token bucket per client with bounded memory |
+| `jigkit.refusals` | — | `NOT_AUTHENTICATED`, `SETUP_REQUIRED`: the `detail` codes the npm package's client knows |
 | `jigkit.auth` | `auth` | Argon2id passwords, a bounded failed-login throttle, the session cookie |
 | `jigkit.auth.sessions` | `auth`, `db` | logins in the database as hashed, revocable tokens with a sliding expiry |
 | `jigkit.auth.invitations` | `auth`, `db` | one-time links, kept as hashes, for someone to choose their own password, for a new account or a reset |

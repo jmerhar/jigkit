@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { ApiClient, ApiError, writeHeader } from "../src/api";
+import { ApiClient, ApiError, NOT_AUTHENTICATED, SETUP_REQUIRED, writeHeader } from "../src/api";
 
 /** A fetch that answers every request with `response`, and records what it was asked. */
 function answering(response: Response | Error) {
@@ -91,6 +91,20 @@ describe("failures", () => {
   it("carries the server's own code", async () => {
     const error = await failure(new ApiClient({ fetcher: answering(json({ detail: "no_rule" }, 409)) }));
     expect([error.status, error.message, error.name]).toEqual([409, "no_rule", "ApiError"]);
+  });
+
+  it("turns a refusal into the application's own error, and leaves the rest as they are", async () => {
+    class LoggedOut extends Error {}
+    const refused = (status: number, reason: string) =>
+      status === 401 && reason === NOT_AUTHENTICATED ? new LoggedOut(reason) : undefined;
+
+    const out = await new ApiClient({ fetcher: answering(json({ detail: "not_authenticated" }, 401)), refused })
+      .request("GET", "/x")
+      .catch((caught: unknown) => caught);
+    expect(out).toBeInstanceOf(LoggedOut);
+
+    const other = await failure(new ApiClient({ fetcher: answering(json({ detail: SETUP_REQUIRED }, 409)), refused }));
+    expect([other.status, other.message]).toEqual([409, "setup_required"]);
   });
 
   it("calls a list of validation errors invalid", async () => {

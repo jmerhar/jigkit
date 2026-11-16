@@ -41,6 +41,7 @@ python/src/jigkit/
   scheduler.py     Schedule (jobs on their own intervals), TickLoop (one job on a fixed tick)
   notify.py        AppriseSender, redact_url (extra notify)
   ratelimit.py     RateLimiter
+  refusals.py      NOT_AUTHENTICATED, SETUP_REQUIRED: refusal codes, the same in api.ts
   auth/            passwords.py, throttle.py, cookies.py (extra auth); sessions.py
                    (SessionMixin, SessionStore; extras auth and db); invitations.py
                    (InvitationMixin, InvitationStore; extras auth and db); passkeys.py (extras

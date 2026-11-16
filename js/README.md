@@ -18,7 +18,7 @@ Each module is its own entry point and imports nothing it does not use; all but
 | `@jmerhar/jigkit/i18n` | `createLanguage(runtime, { storageKey, intl })` over the app's generated Paraglide runtime: the person's choice, else the browser's languages, else the base one; `match` |
 | `@jmerhar/jigkit/i18n/build` | `paraglideOptions()`, for the Vite plugin and a compile script |
 | `@jmerhar/jigkit/i18n/testing` | `catalogueProblems`, `placeholders`, `texts`: every catalogue matches the first, placeholders included, across a message's variants |
-| `@jmerhar/jigkit/api` | `ApiClient` and `ApiError`: JSON or a form in, JSON out, the write-guard header on writes, every failure with its status and the server's code |
+| `@jmerhar/jigkit/api` | `ApiClient` and `ApiError`: JSON or a form in, JSON out, the write-guard header on writes, every failure with its status and the server's code, or the app's own error through `refused`; `NOT_AUTHENTICATED` and `SETUP_REQUIRED`, the codes for a missing login and first-run setup |
 | `@jmerhar/jigkit/format` | euros and amounts typed either way (`parseAmount`), basis points as percentages, days, moments, calendar dates in a time zone, file sizes; the locale is always a parameter |
 | `@jmerhar/jigkit/passkeys` | `browserAuthenticator` over `@simplewebauthn/browser` (an optional peer dependency), `dismissed`, `deviceName`, `passkeyMemory` |
 | `@jmerhar/jigkit/auth/svelte` | `LoginForm` (password, passkey button and autofill), `SetupForm`, `WelcomeForm` (a password chosen from an invitation or reset link), `PasskeyOffer`, `PasskeyList`: Svelte 5 components (an optional peer dependency) taking the app's words and API calls as props, styled by the app's own stylesheet |

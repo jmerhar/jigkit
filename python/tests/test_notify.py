@@ -66,3 +66,5 @@ async def test_the_recording_sender_keeps_what_it_was_given() -> None:
 
     assert await sender.send(["json://a"], "Title", "Body") is False
     assert sender.sent == [Sent(["json://a"], "Title", "Body")]
+    await sender.send([], "Second", "")
+    assert sender.titles == ["Title", "Second"]

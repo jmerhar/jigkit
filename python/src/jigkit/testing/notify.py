@@ -25,3 +25,8 @@ class RecordingSender:
         """Record the message and return ``accept``."""
         self.sent.append(Sent(list(urls), title, body))
         return self.accept
+
+    @property
+    def titles(self) -> list[str]:
+        """The title of every message recorded, in order."""
+        return [sent.title for sent in self.sent]

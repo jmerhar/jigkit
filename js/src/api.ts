@@ -26,6 +26,12 @@ export class ApiError extends Error {
   }
 }
 
+/** 401's code: the request needs a logged-in session and has none. Python's `jigkit.refusals`. */
+export const NOT_AUTHENTICATED = "not_authenticated";
+
+/** 409's code: the application has no administrator yet, and first-run setup comes first. */
+export const SETUP_REQUIRED = "setup_required";
+
 /** The header the API's write guard (`jigkit.web.install_write_guard`) wants on every write. */
 export function writeHeader(value: string): Record<string, string> {
   return { "X-Requested-With": value };
@@ -44,6 +50,11 @@ export interface ClientOptions {
   unreachable?: (error: unknown) => string;
   /** The message of the error for a failure the server gave no reason for. */
   failed?: (status: number, statusText: string) => string;
+  /**
+   * The application's own error for a refusal, such as one for {@link NOT_AUTHENTICATED} that
+   * sends the interface to its login; undefined leaves it an {@link ApiError}.
+   */
+  refused?: (status: number, reason: string) => Error | undefined;
 }
 
 const READS = new Set(["GET", "HEAD"]);
@@ -98,7 +109,10 @@ export class ApiClient {
       const message = this.options.unreachable?.(error) ?? (error instanceof Error ? error.message : String(error));
       throw new ApiError(0, message);
     }
-    if (!response.ok) throw new ApiError(response.status, await this.reason(response));
+    if (!response.ok) {
+      const reason = await this.reason(response);
+      throw this.options.refused?.(response.status, reason) ?? new ApiError(response.status, reason);
+    }
     if (response.status === 204) return undefined as T;
     return (await response.json()) as T;
   }
