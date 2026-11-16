@@ -1,7 +1,7 @@
-.PHONY: install test test-js check-template coverage lint build lockfile release check clean
+.PHONY: install test test-js check-template coverage lint build release check clean
 
-# help, devtools-update and coverage-tooling come from jmerhar/devtools; make fetches them on the
-# first run and whenever devtools.toml changes.
+# help, devtools-update, coverage-tooling, node-modules and lockfile come from jmerhar/devtools;
+# make fetches them on the first run and whenever devtools.toml changes.
 .DEFAULT_GOAL := help
 include .devtools/make/devtools.mk
 .devtools/make/devtools.mk: devtools.toml bin/devtools-fetch.sh
@@ -13,7 +13,7 @@ install: ## Create the virtualenv and js/node_modules with everything the checks
 	python3.14 -m venv python/.venv
 	python/.venv/bin/pip install --quiet --upgrade pip
 	python/.venv/bin/pip install --quiet -e "python[dev,postgres]"
-	cd js && npm ci --no-fund --no-audit --registry="$$(cd / && npm config get registry)"
+	$(MAKE) node-modules
 
 ##@ Checks
 
@@ -38,9 +38,6 @@ check: lint coverage ## Everything (gate a commit on this)
 
 build: ## Build the Python package into python/dist and check it
 	bin/build.sh
-
-lockfile: ## Regenerate js/package-lock.json (Linux binaries, public registry URLs; needs Docker)
-	.devtools/bin/lockfile.sh
 
 release: ## Cut a release: make release V=X.Y.Z (commits and tags; pushing publishes)
 	.devtools/bin/release.sh $(V)
