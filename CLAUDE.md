@@ -38,7 +38,7 @@ python/src/jigkit/
   heartbeat.py     push-monitor heartbeat after delivered writes (extra heartbeat)
   web/             FastAPI building blocks: access.py (AccessPolicy), guard.py, spa.py, health.py,
                    manifest.py, server.py (serve) (extra web)
-  scheduler.py     TickLoop
+  scheduler.py     Schedule (jobs on their own intervals), TickLoop (one job on a fixed tick)
   notify.py        AppriseSender, redact_url (extra notify)
   ratelimit.py     RateLimiter
   auth/            passwords.py, throttle.py, cookies.py (extra auth); sessions.py
@@ -82,6 +82,9 @@ devtools.toml      the shared scripts fetched from jmerhar/devtools into .devtoo
 - **The web pieces are building blocks, not a framework.** An application keeps its own app
   factory and lifespan, and applies what it wants; `mount_spa` goes last because its catch-all
   answers whatever no route matched.
+- **A scheduler's interval is always the application's own.** `TickLoop` and `Job` take it
+  without a default, and `AppSettings` has no tick setting: a default here would change every
+  application that relied on it whenever it moved.
 - Each module imports only what its extra provides; `import jigkit` imports nothing else.
 
 - **The template is checked as the application it renders,** by `bin/check-template.sh` in CI:

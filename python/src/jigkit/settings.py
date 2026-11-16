@@ -67,8 +67,9 @@ class AppSettings(BaseSettings):
     revision: str | None = None
 
     #: Whether in-process scheduled work runs. Tests turn it off and drive the work themselves.
+    #: How often it runs is each application's own setting or constant, next to the work it
+    #: paces.
     scheduler_enabled: bool = True
-    scheduler_tick_seconds: int = Field(60, ge=1)
 
     @model_validator(mode="before")
     @classmethod

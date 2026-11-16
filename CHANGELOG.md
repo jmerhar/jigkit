@@ -4,6 +4,24 @@ All notable changes to jigkit are recorded here. The Python and npm packages sha
 
 ## Unreleased
 
+### Added
+
+- `jigkit.scheduler.Schedule`: several `Job`s, each on its own interval counted from when it
+  started, a job able to move its own next run (`due_in`), each failure reported to a `Reporter`
+  (`LoggingReporter` by default) while the other jobs carry on, and jobs marked `on_wake` run
+  at once when an event is set (`wait_or_wake`).
+
+### Changed
+
+- `TickLoop` is a `Schedule` with one job: its interval counts from when a tick started, so a
+  tick that took longer than the interval is followed by the next at once. It takes a `clock`
+  beside its `sleep`.
+
+### Removed
+
+- `AppSettings.scheduler_tick_seconds`. An application declares its own interval, as a setting
+  or a constant, so a change of default can never change how often its work runs.
+
 ## 0.18.0 — 2026-11-14
 
 ### Fixed
