@@ -8,6 +8,8 @@ All notable changes to jigkit are recorded here. The Python and npm packages sha
 
 - The template's Dependabot config puts each ecosystem's majors in a pull request of their own,
   beside the one of minor and patch releases; GitHub Actions majors are merged once green.
+- The template's interface builds from `@jmerhar/frontend-config`'s Vite, Vitest and TypeScript
+  presets, keeping only its own plugins, test files and coverage exclusions.
 - The template's `package.json` decides every install script under `allowScripts`, which
   `make lint` requires.
 
