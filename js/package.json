@@ -104,5 +104,8 @@
   "publishConfig": {
     "access": "public",
     "provenance": true
+  },
+  "allowScripts": {
+    "fsevents": false
   }
 }
