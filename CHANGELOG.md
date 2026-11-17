@@ -4,6 +4,11 @@ All notable changes to jigkit are recorded here. The Python and npm packages sha
 
 ## Unreleased
 
+### Changed
+
+- The template's Dependabot config puts each ecosystem's majors in a pull request of their own,
+  beside the one of minor and patch releases.
+
 ## 0.21.0 — 2026-11-16
 
 ### Added
