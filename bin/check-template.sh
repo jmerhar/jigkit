@@ -51,11 +51,14 @@ cd "$app"
 git init --quiet
 
 # The application pins the newest release before this commit, which on a release commit and the
-# ones just after it may still be on its way to PyPI and npm: wait for both to serve it.
+# ones just after it may still be on its way to PyPI and npm: wait until pip and npm themselves
+# can fetch it, since each index format is cached apart and one can serve it before another.
 pinned=$(grep -m1 -oE '"@jmerhar/jigkit": "[^"]+"' frontend/package.json | cut -d'"' -f4)
 echo "--- waiting for jigkit $pinned on PyPI and npm"
+probe="$(mktemp -d)"
 deadline=$((SECONDS + wait))
-until curl -fsS https://pypi.org/simple/jigkit/ 2>/dev/null | grep -q "jigkit-${pinned}[.-]" &&
+until python3 -m pip download --quiet --no-deps --no-cache-dir --dest "$probe" \
+  "jigkit==$pinned" >/dev/null 2>&1 &&
   npm view "@jmerhar/jigkit@$pinned" version 2>/dev/null | grep -qx "$pinned"; do
   if [ "$SECONDS" -ge "$deadline" ]; then
     echo "template check: jigkit $pinned is not on PyPI and npm after ${wait}s" >&2
@@ -63,6 +66,7 @@ until curl -fsS https://pypi.org/simple/jigkit/ 2>/dev/null | grep -q "jigkit-${
   fi
   sleep 15
 done
+rm -r "$probe"
 
 echo "--- lockfile, install and the API's types"
 make lockfile
