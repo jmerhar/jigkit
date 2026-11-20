@@ -19,9 +19,7 @@
   }: { api: Api; authenticator: Authenticator; reload: () => void; me: Me } = $props();
 
   // The form starts from the account as it is, and is the person's to change from there.
-  // svelte-ignore state_referenced_locally
   let name = $state(me.name);
-  // svelte-ignore state_referenced_locally
   let language = $state<string>(me.language ?? "");
   let current = $state("");
   let next = $state("");

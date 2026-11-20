@@ -50,8 +50,9 @@ test-frontend: ## Type-check the interface and run its suite
 coverage: ## Run both suites with coverage and print the combined summary
 	bin/coverage.sh --format md
 
-lint: ## ShellCheck, ruff, the lockfile, versions and compose files
+lint: ## ShellCheck, ruff, the lockfile, versions, compose files, and ESLint on the interface
 	.devtools/bin/lint.sh
+	npm --prefix frontend run lint
 
 openapi: ## Re-export the API schema and regenerate the interface's types
 	.devtools/bin/openapi.sh
